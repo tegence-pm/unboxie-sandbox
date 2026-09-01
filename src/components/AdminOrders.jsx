@@ -68,7 +68,7 @@ export default function AdminOrders({
     e.preventDefault();
     if (!selectedPartnerName || !activeOrder) return;
     onAssignPartner(activeOrder.orderId, selectedPartnerName);
-    setAssignmentSuccessMsg(`Partner "${selectedPartnerName}" assigned! Order status updated to "Assigned".`);
+    setAssignmentSuccessMsg(`Partner "${selectedPartnerName}" assigned! Delivery status updated to Assigned.`);
     setTimeout(() => setAssignmentSuccessMsg(''), 3000);
   };
 
@@ -107,7 +107,7 @@ export default function AdminOrders({
         <div className="space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h1 className="text-xl font-bold text-slate-900 tracking-tight">Orders</h1>
+              <h1 className="text-xl font-bold text-slate-900 tracking-tight">Orders & Logistics</h1>
               <p className="text-xs text-slate-500 mt-0.5">
                 Manage incoming customer gift orders, assign delivery partners, and advance order status sequentially.
               </p>
@@ -298,9 +298,7 @@ export default function AdminOrders({
                 </form>
               </div>
 
-              {/* ------------------------------------------------------------- */}
               {/* STRICT SEQUENTIAL LOGISTICS TRACKING & PROGRESSION */}
-              {/* ------------------------------------------------------------- */}
               {!isAssigned ? (
                 <div className="border border-dashed border-slate-200/80 rounded-xl p-6 text-center space-y-2 bg-slate-50/50">
                   <ShieldAlert className="w-8 h-8 text-amber-500 mx-auto" />
@@ -359,80 +357,35 @@ export default function AdminOrders({
                     </div>
                   )}
 
-                  {/* STRICT SEQUENTIAL PROGRESSION CONTROLS */}
-                  <div className="bg-white p-5 rounded-xl border border-slate-200/70 space-y-4">
-                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-3">
+                  {/* REFINED CLEAN SEQUENTIAL ADVANCEMENT ACTION */}
+                  <div className="bg-slate-50/70 p-5 rounded-xl border border-slate-200/70 space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
                       <div>
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Current Status</span>
-                        <span className="font-bold text-slate-900 text-sm">{activeOrder.status}</span>
+                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Current Logistics Status</span>
+                        <div className="flex items-center space-x-2 mt-0.5">
+                          <span className="font-bold text-slate-900 text-sm">{activeOrder.status}</span>
+                          <span className="text-xs text-slate-400 font-mono">(Step {currentIdx + 1} of {trackingSequence.length})</span>
+                        </div>
                       </div>
 
                       {nextStatus ? (
                         <button
                           onClick={() => handleAdvanceSequentialStatus(nextStatus)}
-                          className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-4 py-2 rounded-lg shadow-xs transition text-xs flex items-center space-x-2"
+                          className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-4 py-2.5 rounded-xl shadow-xs transition text-xs flex items-center space-x-2"
                         >
                           <span>Advance to Next Step: "{nextStatus}"</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </button>
                       ) : (
-                        <span className="inline-flex items-center space-x-1 bg-emerald-50 text-emerald-700 font-bold px-3 py-1.5 rounded-lg border border-emerald-200 text-xs">
+                        <span className="inline-flex items-center space-x-1 bg-emerald-50 text-emerald-700 font-bold px-3 py-2 rounded-xl border border-emerald-200 text-xs">
                           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                          <span>Order Delivery Completed</span>
+                          <span>Delivery Completed</span>
                         </span>
                       )}
                     </div>
-
-                    {/* SEQUENTIAL STATUS DROPDOWN ENFORCEMENT */}
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                        Sequential Status Progression Dropdown (No Steps Skipped):
-                      </label>
-                      <div className="flex items-center space-x-3">
-                        <select
-                          value={activeOrder.status}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            if (val !== activeOrder.status) {
-                              handleAdvanceSequentialStatus(val);
-                            }
-                          }}
-                          disabled={isCompleted}
-                          className="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-xs font-semibold focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 focus:outline-none bg-white"
-                        >
-                          {/* Current Status */}
-                          <option value={activeOrder.status} disabled>
-                            Current: {activeOrder.status} (Step {currentIdx + 1} of {trackingSequence.length})
-                          </option>
-
-                          {/* Next Sequential Step ONLY */}
-                          {nextStatus && (
-                            <option value={nextStatus}>
-                              ➜ Advance to Step {currentIdx + 2}: {nextStatus}
-                            </option>
-                          )}
-
-                          {/* Exception Terminal State */}
-                          {!isCompleted && (
-                            <option value="Failed">
-                              ⚠ Flag Exception: Mark as Failed / Delivery Exception
-                            </option>
-                          )}
-                        </select>
-
-                        {nextStatus && (
-                          <button
-                            onClick={() => handleAdvanceSequentialStatus(nextStatus)}
-                            className="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-3 py-2 rounded-lg text-xs transition"
-                          >
-                            Advance ➔
-                          </button>
-                        )}
-                      </div>
-                      <p className="text-[11px] text-slate-400 mt-1.5">
-                        * Note: Status can only advance to the immediate next step in the pipeline. Skipped steps are restricted to maintain logistics integrity.
-                      </p>
-                    </div>
+                    <p className="text-[11px] text-slate-400 border-t border-slate-200/60 pt-2">
+                      * Note: Status advances strictly one step at a time in sequence to preserve logistics data integrity.
+                    </p>
                   </div>
                 </div>
               )}

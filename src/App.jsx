@@ -5,6 +5,7 @@ import Flow1Discounts from './components/Flow1Discounts';
 import Flow2Logistics from './components/Flow2Logistics';
 import Flow3Checkout from './components/Flow3Checkout';
 import Flow4Feedback from './components/Flow4Feedback';
+import FlowOverviewLanding from './components/FlowOverviewLanding';
 import GuidedFlowBar from './components/GuidedFlowBar';
 
 import {
@@ -16,7 +17,7 @@ import {
   initialFeedback
 } from './data/initialData';
 
-import { ShoppingBag, Eye } from 'lucide-react';
+import { ShoppingBag, Eye, Home, Sparkles, LayoutGrid } from 'lucide-react';
 
 export default function App() {
   // Global Shared State
@@ -27,9 +28,9 @@ export default function App() {
   const [shipments, setShipments] = useState(initialShipments);
   const [feedbackList, setFeedbackList] = useState(initialFeedback);
 
-  // Navigation State
-  const [mainMode, setMainMode] = useState('admin'); // 'admin' | 'customer'
-  const [adminTab, setAdminTab] = useState('orders'); // 'orders' | 'products' | 'logistics' | 'feedback' | ...
+  // Navigation Modes: 'overview' (Landing page) | 'admin' | 'customer'
+  const [mainMode, setMainMode] = useState('overview'); 
+  const [adminTab, setAdminTab] = useState('orders'); // 'orders' | 'products' | 'logistics' | 'feedback'
   const [logisticsSubTab, setLogisticsSubTab] = useState('locations'); // 'locations' | 'partners'
   const [customerSubMode, setCustomerSubMode] = useState('customer'); // 'customer' | 'customer-detail' | 'checkout' | 'feedback'
   const [feedbackCustomerViewMode, setFeedbackCustomerViewMode] = useState('invitation'); // 'invitation' | 'form' | 'submitted'
@@ -91,21 +92,36 @@ export default function App() {
     setFeedbackList([newFb, ...feedbackList]);
   };
 
-  // Jump preset helper from top Guided Flow Bar
+  // Select flow launcher from Overview Landing Page or Guided Bar
   const handleJumpToFlow = (flowKey) => {
     if (flowKey === 'flow1') {
       setMainMode('admin');
       setAdminTab('products');
     } else if (flowKey === 'flow2') {
       setMainMode('admin');
-      setAdminTab('orders');
+      setAdminTab('logistics');
+      setLogisticsSubTab('locations');
     } else if (flowKey === 'flow3') {
-      setMainMode('customer');
-      setCustomerSubMode('checkout');
+      setMainMode('admin');
+      setAdminTab('orders');
     } else if (flowKey === 'flow4') {
       setMainMode('customer');
       setCustomerSubMode('feedback');
       setFeedbackCustomerViewMode('invitation');
+    } else if (flowKey === 'admin' || flowKey === 'admin-products') {
+      setMainMode('admin');
+      setAdminTab('products');
+    } else if (flowKey === 'admin-locations') {
+      setMainMode('admin');
+      setAdminTab('logistics');
+    } else if (flowKey === 'admin-orders') {
+      setMainMode('admin');
+      setAdminTab('orders');
+    } else if (flowKey === 'customer' || flowKey === 'customer-feedback') {
+      setMainMode('customer');
+      setCustomerSubMode('customer');
+    } else if (flowKey === 'overview') {
+      setMainMode('overview');
     }
   };
 
@@ -134,18 +150,52 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900">
       {/* Top Guided Flow Preset Bar */}
       <GuidedFlowBar onJumpToFlow={handleJumpToFlow} />
 
-      {/* CUSTOMER STOREFRONT HEADER (Shown when in Customer Mode) */}
+      {/* OVERVIEW LANDING HEADER */}
+      {mainMode === 'overview' && (
+        <header className="bg-white border-b border-slate-200/80 px-6 py-4 sticky top-0 z-30 shadow-xs">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div 
+                onClick={() => setMainMode('overview')}
+                className="bg-orange-500 text-white font-extrabold px-3 py-1 rounded-md text-lg tracking-tight cursor-pointer"
+              >
+                Unboxie
+              </div>
+              <span className="text-xs bg-slate-100 text-slate-700 font-semibold px-2.5 py-0.5 rounded border border-slate-200">
+                Interactive Prototype Overview
+              </span>
+            </div>
+
+            <div className="flex items-center space-x-3 text-xs font-semibold">
+              <button
+                onClick={() => setMainMode('admin')}
+                className="bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2 rounded-lg transition"
+              >
+                Admin Platform ➔
+              </button>
+              <button
+                onClick={() => setMainMode('customer')}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-3.5 py-2 rounded-lg transition"
+              >
+                Customer Storefront ➔
+              </button>
+            </div>
+          </div>
+        </header>
+      )}
+
+      {/* CUSTOMER STOREFRONT HEADER */}
       {mainMode === 'customer' && (
-        <header className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-30 shadow-sm">
+        <header className="bg-white border-b border-slate-200/80 px-6 py-4 sticky top-0 z-30 shadow-xs">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div 
                 onClick={() => setCustomerSubMode('customer')} 
-                className="bg-orange-500 text-white font-extrabold px-3 py-1 rounded text-xl tracking-tight cursor-pointer"
+                className="bg-orange-500 text-white font-extrabold px-3 py-1 rounded-md text-lg tracking-tight cursor-pointer"
               >
                 Unboxie
               </div>
@@ -154,8 +204,7 @@ export default function App() {
               </span>
             </div>
 
-            {/* Customer Header Navigation */}
-            <div className="flex items-center space-x-6 text-sm font-semibold text-gray-700">
+            <div className="flex items-center space-x-6 text-xs font-semibold text-slate-700">
               <button 
                 onClick={() => setCustomerSubMode('customer')} 
                 className={`hover:text-orange-600 ${customerSubMode === 'customer' || customerSubMode === 'customer-detail' ? 'text-orange-600 border-b-2 border-orange-500 pb-0.5' : ''}`}
@@ -176,20 +225,37 @@ export default function App() {
               </button>
             </div>
 
-            {/* Switch to Admin Button */}
-            <button
-              onClick={() => setMainMode('admin')}
-              className="bg-gray-900 hover:bg-gray-800 text-white text-xs font-semibold px-4 py-2 rounded-md transition shadow-sm flex items-center space-x-2"
-            >
-              <Eye className="w-3.5 h-3.5" />
-              <span>Switch to Admin Panel</span>
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setMainMode('overview')}
+                className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition border border-slate-200 flex items-center space-x-1.5"
+              >
+                <Home className="w-3.5 h-3.5 text-slate-500" />
+                <span>Overview Landing</span>
+              </button>
+              <button
+                onClick={() => setMainMode('admin')}
+                className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition shadow-xs flex items-center space-x-1.5"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>Admin Panel</span>
+              </button>
+            </div>
           </div>
         </header>
       )}
 
       {/* ------------------------------------------------------------- */}
-      {/* ADMIN MODE VIEW */}
+      {/* MODE 1: OVERVIEW LANDING PAGE */}
+      {/* ------------------------------------------------------------- */}
+      {mainMode === 'overview' && (
+        <main className="flex-1">
+          <FlowOverviewLanding onSelectFlow={handleJumpToFlow} />
+        </main>
+      )}
+
+      {/* ------------------------------------------------------------- */}
+      {/* MODE 2: ADMIN BACK OFFICE */}
       {/* ------------------------------------------------------------- */}
       {mainMode === 'admin' && (
         <AdminLayout
@@ -197,7 +263,21 @@ export default function App() {
           setCurrentTab={setAdminTab}
           onSwitchToCustomer={() => setMainMode('customer')}
         >
-          {/* ORDERS TAB WITH EMBEDDED PARTNER ASSIGNMENT & SHIPMENT TRACKING */}
+          {/* Top Home Switcher Button inside Admin */}
+          <div className="mb-4 flex justify-between items-center border-b border-slate-100 pb-3">
+            <button
+              onClick={() => setMainMode('overview')}
+              className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80 px-2.5 py-1 rounded-lg transition border border-slate-200/60"
+            >
+              <Home className="w-3.5 h-3.5 text-slate-400" />
+              <span>← All Flows Overview</span>
+            </button>
+            <span className="text-[11px] text-slate-400 font-mono">
+              Admin View Mode: <strong className="text-slate-700 capitalize">{adminTab}</strong>
+            </span>
+          </div>
+
+          {/* ORDERS TAB */}
           {adminTab === 'orders' && (
             <AdminOrders
               shipments={shipments}
@@ -208,7 +288,7 @@ export default function App() {
             />
           )}
 
-          {/* FLOW 1: PRODUCTS TAB */}
+          {/* PRODUCTS TAB */}
           {adminTab === 'products' && (
             <Flow1Discounts
               products={products}
@@ -223,7 +303,7 @@ export default function App() {
             />
           )}
 
-          {/* FLOW 2: LOGISTICS TAB (LOCATIONS & PARTNERS) */}
+          {/* LOGISTICS TAB */}
           {adminTab === 'logistics' && (
             <Flow2Logistics
               doorLocations={doorLocations}
@@ -237,7 +317,7 @@ export default function App() {
             />
           )}
 
-          {/* FLOW 4: ADMIN FEEDBACK TAB */}
+          {/* ADMIN FEEDBACK TAB */}
           {adminTab === 'feedback' && (
             <Flow4Feedback
               feedbackList={feedbackList}
@@ -255,17 +335,15 @@ export default function App() {
             />
           )}
 
-          {/* DASHBOARD / OTHER PLACEHOLDER TABS */}
+          {/* OTHER PLACEHOLDER TABS */}
           {['dashboard', 'categories', 'occasions'].includes(adminTab) && (
-            <div className="py-12 text-center space-y-4">
-              <ShoppingBag className="w-12 h-12 text-gray-300 mx-auto" />
-              <h2 className="text-lg font-bold text-gray-800 capitalize">{adminTab} Module</h2>
-              <p className="text-xs text-gray-500 max-w-sm mx-auto">
-                This module is active. For key engineering features, please select 
-                <button onClick={() => setAdminTab('orders')} className="text-orange-600 font-bold ml-1 hover:underline">Orders</button>, 
-                <button onClick={() => setAdminTab('products')} className="text-orange-600 font-bold ml-1 hover:underline">Products</button>, 
-                <button onClick={() => setAdminTab('logistics')} className="text-orange-600 font-bold ml-1 hover:underline">Logistics</button>, or 
-                <button onClick={() => setAdminTab('feedback')} className="text-orange-600 font-bold ml-1 hover:underline">Feedback</button>.
+            <div className="py-12 text-center space-y-3">
+              <ShoppingBag className="w-10 h-10 text-slate-300 mx-auto" />
+              <h2 className="text-base font-bold text-slate-800 capitalize">{adminTab} Module</h2>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                Select <button onClick={() => setAdminTab('orders')} className="text-orange-600 font-bold hover:underline">Orders</button>, 
+                <button onClick={() => setAdminTab('products')} className="text-orange-600 font-bold ml-1 hover:underline">Products</button>, or 
+                <button onClick={() => setAdminTab('logistics')} className="text-orange-600 font-bold ml-1 hover:underline">Delivery Settings</button> to test core flows.
               </p>
             </div>
           )}
@@ -273,7 +351,7 @@ export default function App() {
       )}
 
       {/* ------------------------------------------------------------- */}
-      {/* CUSTOMER MODE VIEW */}
+      {/* MODE 3: CUSTOMER STOREFRONT */}
       {/* ------------------------------------------------------------- */}
       {mainMode === 'customer' && (
         <main className="flex-1">
