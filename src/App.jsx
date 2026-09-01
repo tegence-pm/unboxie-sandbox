@@ -6,7 +6,7 @@ import Flow2Logistics from './components/Flow2Logistics';
 import Flow3Checkout from './components/Flow3Checkout';
 import Flow4Feedback from './components/Flow4Feedback';
 import FlowOverviewLanding from './components/FlowOverviewLanding';
-import GuidedFlowBar from './components/GuidedFlowBar';
+import InteractiveTourBanner, { TOUR_STEPS } from './components/InteractiveTourBanner';
 
 import {
   initialProducts,
@@ -17,7 +17,7 @@ import {
   initialFeedback
 } from './data/initialData';
 
-import { ShoppingBag, Eye, Home, Sparkles, LayoutGrid } from 'lucide-react';
+import { Eye, Home, ShoppingBag } from 'lucide-react';
 
 export default function App() {
   // Global Shared State
@@ -28,9 +28,13 @@ export default function App() {
   const [shipments, setShipments] = useState(initialShipments);
   const [feedbackList, setFeedbackList] = useState(initialFeedback);
 
-  // Navigation Modes: 'overview' (Landing page) | 'admin' | 'customer'
+  // Guided Tour State
+  const [isTourActive, setIsTourActive] = useState(false);
+  const [tourStepIndex, setTourStepIndex] = useState(0);
+
+  // Navigation Modes: 'overview' | 'admin' | 'customer'
   const [mainMode, setMainMode] = useState('overview'); 
-  const [adminTab, setAdminTab] = useState('orders'); // 'orders' | 'products' | 'logistics' | 'feedback'
+  const [adminTab, setAdminTab] = useState('products'); // 'orders' | 'products' | 'logistics' | 'feedback'
   const [logisticsSubTab, setLogisticsSubTab] = useState('locations'); // 'locations' | 'partners'
   const [customerSubMode, setCustomerSubMode] = useState('customer'); // 'customer' | 'customer-detail' | 'checkout' | 'feedback'
   const [feedbackCustomerViewMode, setFeedbackCustomerViewMode] = useState('invitation'); // 'invitation' | 'form' | 'submitted'
@@ -92,37 +96,32 @@ export default function App() {
     setFeedbackList([newFb, ...feedbackList]);
   };
 
-  // Select flow launcher from Overview Landing Page or Guided Bar
-  const handleJumpToFlow = (flowKey) => {
-    if (flowKey === 'flow1') {
-      setMainMode('admin');
-      setAdminTab('products');
-    } else if (flowKey === 'flow2') {
-      setMainMode('admin');
-      setAdminTab('logistics');
-      setLogisticsSubTab('locations');
-    } else if (flowKey === 'flow3') {
-      setMainMode('admin');
-      setAdminTab('orders');
-    } else if (flowKey === 'flow4') {
-      setMainMode('customer');
-      setCustomerSubMode('feedback');
-      setFeedbackCustomerViewMode('invitation');
-    } else if (flowKey === 'admin' || flowKey === 'admin-products') {
-      setMainMode('admin');
-      setAdminTab('products');
-    } else if (flowKey === 'admin-locations') {
-      setMainMode('admin');
-      setAdminTab('logistics');
-    } else if (flowKey === 'admin-orders') {
-      setMainMode('admin');
-      setAdminTab('orders');
-    } else if (flowKey === 'customer' || flowKey === 'customer-feedback') {
-      setMainMode('customer');
-      setCustomerSubMode('customer');
-    } else if (flowKey === 'overview') {
-      setMainMode('overview');
+  // Tour Step Navigation
+  const navigateToTourStep = (stepIdx) => {
+    setIsTourActive(true);
+    setTourStepIndex(stepIdx);
+    const stepConfig = TOUR_STEPS[stepIdx] || TOUR_STEPS[0];
+
+    setMainMode(stepConfig.mode);
+    if (stepConfig.mode === 'admin') {
+      setAdminTab(stepConfig.tab);
+      if (stepConfig.tab === 'logistics') {
+        setLogisticsSubTab('locations');
+      }
+    } else if (stepConfig.mode === 'customer') {
+      setCustomerSubMode(stepConfig.subMode || 'customer');
+      if (stepConfig.feedbackSubMode) {
+        setFeedbackCustomerViewMode(stepConfig.feedbackSubMode);
+      }
     }
+  };
+
+  const startGuidedTour = () => {
+    navigateToTourStep(0);
+  };
+
+  const restartGuidedTour = () => {
+    navigateToTourStep(0);
   };
 
   // Handle completing checkout flow
@@ -151,8 +150,14 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900">
-      {/* Top Guided Flow Preset Bar */}
-      <GuidedFlowBar onJumpToFlow={handleJumpToFlow} />
+      {/* Persistent Guided Tour Banner when active */}
+      {isTourActive && (
+        <InteractiveTourBanner
+          currentStepIndex={tourStepIndex}
+          onNavigateStep={navigateToTourStep}
+          onRestartTour={restartGuidedTour}
+        />
+      )}
 
       {/* OVERVIEW LANDING HEADER */}
       {mainMode === 'overview' && (
@@ -172,16 +177,22 @@ export default function App() {
 
             <div className="flex items-center space-x-3 text-xs font-semibold">
               <button
+                onClick={startGuidedTour}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition font-bold"
+              >
+                Start Guided Tour ▶
+              </button>
+              <button
                 onClick={() => setMainMode('admin')}
                 className="bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2 rounded-lg transition"
               >
-                Admin Platform ➔
+                Admin Platform
               </button>
               <button
                 onClick={() => setMainMode('customer')}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-3.5 py-2 rounded-lg transition"
+                className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-lg transition border border-slate-200"
               >
-                Customer Storefront ➔
+                Customer Storefront
               </button>
             </div>
           </div>
@@ -231,7 +242,7 @@ export default function App() {
                 className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition border border-slate-200 flex items-center space-x-1.5"
               >
                 <Home className="w-3.5 h-3.5 text-slate-500" />
-                <span>Overview Landing</span>
+                <span>Landing</span>
               </button>
               <button
                 onClick={() => setMainMode('admin')}
@@ -245,32 +256,30 @@ export default function App() {
         </header>
       )}
 
-      {/* ------------------------------------------------------------- */}
       {/* MODE 1: OVERVIEW LANDING PAGE */}
-      {/* ------------------------------------------------------------- */}
       {mainMode === 'overview' && (
         <main className="flex-1">
-          <FlowOverviewLanding onSelectFlow={handleJumpToFlow} />
+          <FlowOverviewLanding
+            onStartTour={startGuidedTour}
+            onJumpToStep={navigateToTourStep}
+          />
         </main>
       )}
 
-      {/* ------------------------------------------------------------- */}
       {/* MODE 2: ADMIN BACK OFFICE */}
-      {/* ------------------------------------------------------------- */}
       {mainMode === 'admin' && (
         <AdminLayout
           currentTab={adminTab}
           setCurrentTab={setAdminTab}
           onSwitchToCustomer={() => setMainMode('customer')}
         >
-          {/* Top Home Switcher Button inside Admin */}
           <div className="mb-4 flex justify-between items-center border-b border-slate-100 pb-3">
             <button
               onClick={() => setMainMode('overview')}
               className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80 px-2.5 py-1 rounded-lg transition border border-slate-200/60"
             >
               <Home className="w-3.5 h-3.5 text-slate-400" />
-              <span>← All Flows Overview</span>
+              <span>← Landing Overview</span>
             </button>
             <span className="text-[11px] text-slate-400 font-mono">
               Admin View Mode: <strong className="text-slate-700 capitalize">{adminTab}</strong>
@@ -350,9 +359,7 @@ export default function App() {
         </AdminLayout>
       )}
 
-      {/* ------------------------------------------------------------- */}
       {/* MODE 3: CUSTOMER STOREFRONT */}
-      {/* ------------------------------------------------------------- */}
       {mainMode === 'customer' && (
         <main className="flex-1">
           {customerSubMode === 'customer' && (
