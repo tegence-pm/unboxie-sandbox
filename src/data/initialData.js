@@ -1,0 +1,261 @@
+export const initialProducts = [
+  {
+    id: 'prod-1',
+    name: 'Jo Malone English Pear & Freesia',
+    category: 'Luxury Self-Care',
+    price: 185000,
+    is_discounted: true,
+    discount_type: 'percentage', // 'percentage' | 'fixed'
+    discount_value: 10, // 10%
+    stock: 12,
+    status: 'Active',
+    image: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=500&auto=format&fit=crop&q=80',
+    description: 'A luscious, golden fragrance capturing the essence of autumn. Sensuous freshness of just-ripe pears wrapped in a bouquet of white freesias.',
+  },
+  {
+    id: 'prod-2',
+    name: 'Luxury Self-Care Box',
+    category: 'Gift Boxes',
+    price: 50000,
+    is_discounted: false,
+    discount_type: 'percentage',
+    discount_value: 0,
+    stock: 24,
+    status: 'Active',
+    image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=500&auto=format&fit=crop&q=80',
+    description: 'Handcrafted wellness essentials featuring body butter, scented candle, bath salts, and a plush silk eye mask.',
+  },
+  {
+    id: 'prod-3',
+    name: 'Nike Air Max',
+    category: 'Fashion',
+    price: 120000,
+    is_discounted: true,
+    discount_type: 'percentage',
+    discount_value: 15, // 15%
+    stock: 8,
+    status: 'Active',
+    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop&q=80',
+    description: 'Iconic street style with maximum air cushioning. Lightweight design with premium suede accents.',
+  },
+  {
+    id: 'prod-4',
+    name: 'Personalized Leather Journal',
+    category: 'Stationery',
+    price: 35000,
+    is_discounted: false,
+    discount_type: 'fixed',
+    discount_value: 0,
+    stock: 18,
+    status: 'Active',
+    image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=500&auto=format&fit=crop&q=80',
+    description: 'Genuine full-grain leather notebook custom engraved with your recipient\'s initials.',
+  },
+];
+
+export const initialDoorLocations = {
+  Lagos: [
+    { id: 'loc-1', name: 'Ikoyi', fee: 2000, status: 'Active' },
+    { id: 'loc-2', name: 'Gbagada', fee: 2000, status: 'Active' },
+    { id: 'loc-3', name: 'Victoria Island', fee: 3000, status: 'Active' },
+    { id: 'loc-4', name: 'Ajah', fee: 3500, status: 'Active' },
+    { id: 'loc-5', name: 'Ikeja', fee: 2500, status: 'Active' },
+    { id: 'loc-6', name: 'Lekki Phase 1', fee: 2500, status: 'Active' },
+    { id: 'loc-7', name: 'Surulere', fee: 2000, status: 'Active' },
+    { id: 'loc-8', name: 'Yaba', fee: 2000, status: 'Active' },
+  ],
+  Abuja: [
+    { id: 'loc-9', name: 'Wuse', fee: 2000, status: 'Active' },
+    { id: 'loc-10', name: 'Garki', fee: 2000, status: 'Active' },
+    { id: 'loc-11', name: 'Maitama', fee: 3000, status: 'Active' },
+    { id: 'loc-12', name: 'Asokoro', fee: 3000, status: 'Active' },
+  ],
+  Rivers: [
+    { id: 'loc-13', name: 'Port Harcourt Township', fee: 2500, status: 'Active' },
+    { id: 'loc-14', name: 'GRA Phase 2', fee: 2500, status: 'Active' },
+    { id: 'loc-15', name: 'Rumuokwuta', fee: 3000, status: 'Active' },
+  ],
+  Delta: [
+    { id: 'loc-16', name: 'Asaba Central', fee: 2000, status: 'Active' },
+    { id: 'loc-17', name: 'Warri Main', fee: 2500, status: 'Active' },
+    { id: 'loc-18', name: 'Effurun', fee: 2500, status: 'Active' },
+    { id: 'loc-19', name: 'Ughelli', fee: 3000, status: 'Active' },
+    { id: 'loc-20', name: 'Sapele', fee: 3000, status: 'Active' },
+  ],
+};
+
+export const initialPickupLocations = {
+  Lagos: [
+    { id: 'pk-1', name: 'GIG Gbagada', address: 'Gbagada Express Way, Lagos', fee: 2000, status: 'Active' },
+    { id: 'pk-2', name: 'GIG Ikeja', address: 'Ikeja Hub, Allen Avenue', fee: 2000, status: 'Active' },
+    { id: 'pk-3', name: 'GIG Lekki', address: 'Lekki Hub, Admiralty Way', fee: 2000, status: 'Active' },
+  ],
+  Abuja: [
+    { id: 'pk-4', name: 'GIG Wuse 2', address: 'Aminu Kano Crescent, Wuse 2', fee: 2000, status: 'Active' },
+    { id: 'pk-5', name: 'GIG Garki', address: 'Area 11, Garki', fee: 2000, status: 'Active' },
+  ],
+  Rivers: [
+    { id: 'pk-6', name: 'GIG Port Harcourt', address: 'Aba Road, Port Harcourt', fee: 2500, status: 'Active' },
+  ],
+  Delta: [],
+};
+
+export const initialPartners = [
+  {
+    id: 'part-1',
+    name: 'GIG Logistics',
+    type: 'Company',
+    email: 'contact@giglogistics.com',
+    phone: '08031234567',
+    address: '15 Commercial Avenue',
+    city: 'Yaba',
+    state: 'Lagos',
+    coverageType: 'Interstate',
+    coverageStates: ['Lagos', 'Abuja', 'Delta'],
+    status: 'Active',
+  },
+  {
+    id: 'part-2',
+    name: 'Tunde Delivery',
+    type: 'Independent Driver',
+    email: 'tunde.d@gmail.com',
+    phone: '08029876543',
+    address: '12 Toyin Street',
+    city: 'Ikeja',
+    state: 'Lagos',
+    coverageType: 'Single State',
+    coverageStates: ['Lagos'],
+    status: 'Active',
+  },
+  {
+    id: 'part-3',
+    name: 'ABC Logistics',
+    type: 'Company',
+    email: 'info@abclogistics.ng',
+    phone: '08051112233',
+    address: '8 Express Way',
+    city: 'Abeokuta',
+    state: 'Ogun',
+    coverageType: 'Interstate',
+    coverageStates: ['Lagos', 'Ogun'],
+    status: 'Active',
+  },
+];
+
+export const initialShipments = [
+  {
+    id: 'SH-00128',
+    orderId: '#483925',
+    customer: 'Eyimofe',
+    customerPhone: '08123456789',
+    deliveryType: 'Door Delivery',
+    location: 'Gbagada, Lagos',
+    address: '15 Example Street, Gbagada, Lagos State',
+    fee: 2000,
+    partner: 'Pending Assignment', // UNASSIGNED ORDER FOR FLOW TESTING
+    status: 'Order Ready',
+    date: 'Sep 1, 2026',
+    history: [
+      { status: 'Order Ready', time: 'Sep 1, 08:30 AM' },
+    ],
+  },
+  {
+    id: 'SH-00129',
+    orderId: '#483920',
+    customer: 'Kemi Adebayo',
+    customerPhone: '08098765432',
+    deliveryType: 'Door Delivery',
+    location: 'Ikoyi, Lagos',
+    address: '12 Bourdillon Road, Ikoyi, Lagos',
+    fee: 2000,
+    partner: 'GIG Logistics', // ASSIGNED ORDER
+    status: 'Out for Delivery',
+    date: 'Sep 1, 2026',
+    history: [
+      { status: 'Order Ready', time: 'Sep 1, 08:30 AM' },
+      { status: 'Assigned to GIG Logistics', time: 'Sep 1, 09:15 AM' },
+      { status: 'Picked Up from Unboxie', time: 'Sep 1, 10:45 AM' },
+      { status: 'Out for Delivery', time: 'Sep 1, 11:30 AM' },
+    ],
+  },
+  {
+    id: 'SH-00130',
+    orderId: '#483921',
+    customer: 'Amaka Okafor',
+    customerPhone: '08033334455',
+    deliveryType: 'Pickup',
+    location: 'GIG Ikeja',
+    address: 'Ikeja Hub, Allen Avenue',
+    fee: 2000,
+    partner: 'Tunde Delivery', // ASSIGNED ORDER
+    status: 'Picked Up from Unboxie',
+    date: 'Sep 1, 2026',
+    history: [
+      { status: 'Order Ready', time: 'Sep 1, 09:00 AM' },
+      { status: 'Assigned to Tunde Delivery', time: 'Sep 1, 10:00 AM' },
+      { status: 'Picked Up from Unboxie', time: 'Sep 1, 11:00 AM' },
+    ],
+  },
+  {
+    id: 'SH-00131',
+    orderId: '#483922',
+    customer: 'David Adeleke',
+    customerPhone: '08177665544',
+    deliveryType: 'Door Delivery',
+    location: 'Victoria Island, Lagos',
+    address: '8 Adetokunbo Ademola Street, VI',
+    fee: 3000,
+    partner: 'ABC Logistics',
+    status: 'Delivered',
+    date: 'Aug 31, 2026',
+    history: [
+      { status: 'Order Ready', time: 'Aug 31, 09:00 AM' },
+      { status: 'Assigned to ABC Logistics', time: 'Aug 31, 10:00 AM' },
+      { status: 'Picked Up from Unboxie', time: 'Aug 31, 11:00 AM' },
+      { status: 'Out for Delivery', time: 'Aug 31, 01:15 PM' },
+      { status: 'Delivered', time: 'Aug 31, 03:30 PM' },
+    ],
+  },
+];
+
+export const initialFeedback = [
+  {
+    id: 'FB-101',
+    customer: 'David Adeleke',
+    orderId: '#483922',
+    rating: 5,
+    review: 'She loved it. It was amazing and everything she wanted.',
+    date: 'Aug 31, 2026',
+    photos: [
+      'https://images.unsplash.com/photo-1513885535751-8b9238bd48?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=600&auto=format&fit=crop&q=80',
+    ],
+    orderInfo: {
+      recipient: 'Mum',
+      occasion: 'Birthday',
+      products: ['Luxury Self-Care Box', 'Scented Soy Candle', 'Personalized Card'],
+      packaging: 'Premium Gift Basket',
+      delivery: 'Doorstep Surprise',
+      location: 'Victoria Island, Lagos',
+    },
+  },
+  {
+    id: 'FB-102',
+    customer: 'Amaka Okafor',
+    orderId: '#483810',
+    rating: 4,
+    review: 'Really beautiful packaging and presentation! My best friend was super excited.',
+    date: 'Aug 30, 2026',
+    photos: [
+      'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=600&auto=format&fit=crop&q=80',
+    ],
+    orderInfo: {
+      recipient: 'Best Friend',
+      occasion: 'Anniversary',
+      products: ['Jo Malone English Pear & Freesia', 'Artisanal Chocolates'],
+      packaging: 'Unboxie Signature Box',
+      delivery: 'Unboxie Hub',
+      location: 'GIG Ikeja, Lagos',
+    },
+  },
+];
