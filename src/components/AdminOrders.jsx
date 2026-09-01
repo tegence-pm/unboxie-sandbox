@@ -13,7 +13,8 @@ import {
   AlertCircle,
   ShieldAlert,
   Eye,
-  ChevronRight
+  ChevronRight,
+  ArrowRight
 } from 'lucide-react';
 
 export default function AdminOrders({ 
@@ -27,6 +28,7 @@ export default function AdminOrders({
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [selectedPartnerName, setSelectedPartnerName] = useState('');
   const [assignmentSuccessMsg, setAssignmentSuccessMsg] = useState('');
+  const [statusUpdateSuccessMsg, setStatusUpdateSuccessMsg] = useState('');
 
   // Selected Order object
   const activeOrder = shipments.find(s => s.orderId === selectedOrderId);
@@ -37,7 +39,7 @@ export default function AdminOrders({
   // Associated Customer Feedback (if any)
   const orderFeedback = feedbackList.find(f => f.orderId === activeOrder?.orderId);
 
-  // Logistics tracking sequence
+  // Strict Sequential Logistics Tracking Sequence
   const trackingSequence = [
     'Order Ready',
     'Assigned',
@@ -46,15 +48,40 @@ export default function AdminOrders({
     'Delivered'
   ];
 
+  // Helper check if order is assigned
+  const isAssigned = activeOrder && activeOrder.partner && activeOrder.partner !== 'Pending Assignment';
+
+  // Get current normalized index in sequence
+  const getCurrentSequenceIndex = () => {
+    if (!activeOrder) return 0;
+    const currentSt = activeOrder.status;
+    if (currentSt.startsWith('Assigned')) return 1;
+    const idx = trackingSequence.indexOf(currentSt);
+    return idx >= 0 ? idx : 0;
+  };
+
+  const currentIdx = getCurrentSequenceIndex();
+  const nextStatus = currentIdx < trackingSequence.length - 1 ? trackingSequence[currentIdx + 1] : null;
+  const isCompleted = activeOrder?.status === 'Delivered';
+
   const handleAssignPartner = (e) => {
     e.preventDefault();
     if (!selectedPartnerName || !activeOrder) return;
     onAssignPartner(activeOrder.orderId, selectedPartnerName);
-    setAssignmentSuccessMsg(`Partner "${selectedPartnerName}" assigned successfully! Delivery tracking is now active.`);
+    setAssignmentSuccessMsg(`Partner "${selectedPartnerName}" assigned! Order status updated to "Assigned".`);
     setTimeout(() => setAssignmentSuccessMsg(''), 3000);
   };
 
+  const handleAdvanceSequentialStatus = (targetStatus) => {
+    if (!activeOrder || !targetStatus) return;
+    onUpdateShipmentStatus(activeOrder.orderId, targetStatus);
+    setStatusUpdateSuccessMsg(`Status advanced to "${targetStatus}"`);
+    setTimeout(() => setStatusUpdateSuccessMsg(''), 2500);
+  };
+
   const getStatusBadge = (status) => {
+    const isAssignedStatus = status.startsWith('Assigned');
+    const displayStatus = isAssignedStatus ? 'Assigned' : status;
     const styles = {
       'Order Ready': 'bg-slate-100 text-slate-700 border-slate-200',
       'Assigned': 'bg-blue-50 text-blue-700 border-blue-200/80',
@@ -64,15 +91,12 @@ export default function AdminOrders({
       'Failed': 'bg-rose-50 text-rose-700 border-rose-200/80',
     };
     return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles[status] || 'bg-slate-100 text-slate-800'}`}>
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles[displayStatus] || 'bg-slate-100 text-slate-800'}`}>
         <span className="w-1.5 h-1.5 rounded-full bg-current mr-1.5"></span>
         {status}
       </span>
     );
   };
-
-  // Helper check if order is assigned
-  const isAssigned = activeOrder && activeOrder.partner && activeOrder.partner !== 'Pending Assignment';
 
   return (
     <div className="space-y-6 font-sans text-slate-900">
@@ -85,7 +109,7 @@ export default function AdminOrders({
             <div>
               <h1 className="text-xl font-bold text-slate-900 tracking-tight">Orders</h1>
               <p className="text-xs text-slate-500 mt-0.5">
-                Manage incoming customer gift orders, assign delivery partners, and track shipments.
+                Manage incoming customer gift orders, assign delivery partners, and advance order status sequentially.
               </p>
             </div>
           </div>
@@ -95,7 +119,7 @@ export default function AdminOrders({
             <div className="px-5 py-3.5 bg-slate-50/70 border-b border-slate-200/80 flex justify-between items-center text-xs font-semibold text-slate-500">
               <span className="uppercase tracking-wider text-[11px]">All Orders ({shipments.length})</span>
               <span className="text-slate-400 font-normal">
-                Click "View Order" to assign a partner & unlock live tracking
+                Click "View Order" to assign a partner & advance order status
               </span>
             </div>
 
@@ -107,7 +131,7 @@ export default function AdminOrders({
                     <th className="py-3.5 px-5">Customer</th>
                     <th className="py-3.5 px-5">Delivery Location</th>
                     <th className="py-3.5 px-5">Logistics Partner</th>
-                    <th className="py-3.5 px-5">Status</th>
+                    <th className="py-3.5 px-5">Order Status</th>
                     <th className="py-3.5 px-5">Date</th>
                     <th className="py-3.5 px-5 text-right">Action</th>
                   </tr>
@@ -117,23 +141,16 @@ export default function AdminOrders({
                     const hasPartner = ord.partner && ord.partner !== 'Pending Assignment';
                     return (
                       <tr key={ord.id} className="hover:bg-slate-50/60 transition">
-                        {/* Order ID */}
                         <td className="py-4 px-5 font-mono font-bold text-orange-600">
                           {ord.orderId}
                         </td>
-
-                        {/* Customer */}
                         <td className="py-4 px-5 font-semibold text-slate-900">
                           {ord.customer}
                         </td>
-
-                        {/* Delivery Location */}
                         <td className="py-4 px-5">
                           <div className="text-slate-900 font-medium">{ord.deliveryType}</div>
                           <div className="text-slate-500 text-[11px]">{ord.location}</div>
                         </td>
-
-                        {/* Logistics Partner */}
                         <td className="py-4 px-5">
                           {hasPartner ? (
                             <span className="inline-flex items-center space-x-1 font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md text-xs border border-emerald-200/60">
@@ -147,14 +164,8 @@ export default function AdminOrders({
                             </span>
                           )}
                         </td>
-
-                        {/* Status */}
                         <td className="py-4 px-5">{getStatusBadge(ord.status)}</td>
-
-                        {/* Date */}
                         <td className="py-4 px-5 text-slate-500">{ord.date}</td>
-
-                        {/* Action */}
                         <td className="py-4 px-5 text-right">
                           <button
                             onClick={() => {
@@ -180,7 +191,6 @@ export default function AdminOrders({
         /* VIEW 2: INDIVIDUAL ORDER PAGE DETAIL */
         /* ------------------------------------------------------------- */
         <div className="space-y-6">
-          {/* Back Button */}
           <button
             onClick={() => setSelectedOrderId(null)}
             className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition bg-white px-3 py-1.5 rounded-lg border border-slate-200/80 shadow-xs"
@@ -239,10 +249,10 @@ export default function AdminOrders({
                   <div>
                     <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
                       <Truck className="w-4 h-4 text-orange-500" />
-                      <span>Assign Delivery Partner</span>
+                      <span>Step 1: Assign Delivery Partner</span>
                     </h3>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Assign a logistics partner to unlock live delivery tracking on this order page.
+                      Assign a logistics partner to unlock order status progression.
                     </p>
                   </div>
                   {isAssigned && (
@@ -288,42 +298,37 @@ export default function AdminOrders({
                 </form>
               </div>
 
-              {/* DELIVERY & SHIPMENT TRACKING SECTION */}
+              {/* ------------------------------------------------------------- */}
+              {/* STRICT SEQUENTIAL LOGISTICS TRACKING & PROGRESSION */}
+              {/* ------------------------------------------------------------- */}
               {!isAssigned ? (
-                /* UNASSIGNED PLACEHOLDER CALLOUT */
                 <div className="border border-dashed border-slate-200/80 rounded-xl p-6 text-center space-y-2 bg-slate-50/50">
                   <ShieldAlert className="w-8 h-8 text-amber-500 mx-auto" />
                   <h4 className="text-xs font-bold text-slate-800">
-                    No Delivery Partner Assigned Yet
+                    Order Status Locked — Partner Assignment Required
                   </h4>
                   <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                    Assign a logistics partner above to activate delivery tracking on this order.
+                    Assign a logistics partner above to unlock sequential order status progression.
                   </p>
                 </div>
               ) : (
-                /* ASSIGNED DELIVERY INFORMATION & SHIPMENT TRACKING */
-                <div className="border-t border-slate-100 pt-5 space-y-4">
+                <div className="border-t border-slate-100 pt-5 space-y-5">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
                         <Clock className="w-4 h-4 text-orange-500" />
-                        <span>Delivery Information & Shipment Tracking</span>
+                        <span>Step 2: Sequential Order Status Progression</span>
                       </h3>
                       <p className="text-xs text-slate-500 mt-0.5">
-                        Logistics tracking timeline managed directly on this order page.
+                        Advance status step-by-step in order without skipping stages.
                       </p>
                     </div>
                   </div>
 
-                  {/* Sleek Progress Stepper */}
+                  {/* Visual Stepper */}
                   <div className="bg-slate-50/70 p-4 rounded-xl border border-slate-200/70">
                     <div className="grid grid-cols-5 gap-2 text-center relative">
                       {trackingSequence.map((st, idx) => {
-                        const currentIdx = trackingSequence.indexOf(
-                          activeOrder.status === 'Assigned to GIG Logistics' || activeOrder.status === 'Assigned to Tunde Delivery' || activeOrder.status === 'Assigned to ABC Logistics'
-                            ? 'Assigned'
-                            : activeOrder.status
-                        );
                         const isDone = currentIdx >= idx;
                         const isCurrent = currentIdx === idx;
 
@@ -347,25 +352,86 @@ export default function AdminOrders({
                     </div>
                   </div>
 
-                  {/* Interactive Status Controls */}
-                  <div className="bg-white p-4 rounded-xl border border-slate-200/70 space-y-2">
-                    <span className="text-xs font-semibold text-slate-700 block">
-                      Update Logistics Status:
-                    </span>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                      {trackingSequence.map((st) => (
+                  {statusUpdateSuccessMsg && (
+                    <div className="p-3 bg-emerald-50 border border-emerald-200/70 text-emerald-700 rounded-lg text-xs font-semibold flex items-center space-x-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <span>{statusUpdateSuccessMsg}</span>
+                    </div>
+                  )}
+
+                  {/* STRICT SEQUENTIAL PROGRESSION CONTROLS */}
+                  <div className="bg-white p-5 rounded-xl border border-slate-200/70 space-y-4">
+                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-3">
+                      <div>
+                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Current Status</span>
+                        <span className="font-bold text-slate-900 text-sm">{activeOrder.status}</span>
+                      </div>
+
+                      {nextStatus ? (
                         <button
-                          key={st}
-                          onClick={() => onUpdateShipmentStatus(activeOrder.orderId, st)}
-                          className={`py-1.5 px-3 rounded-lg font-medium text-center border transition ${
-                            activeOrder.status === st
-                              ? 'bg-orange-500 text-white border-orange-500 font-bold shadow-xs'
-                              : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100/70'
-                          }`}
+                          onClick={() => handleAdvanceSequentialStatus(nextStatus)}
+                          className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-4 py-2 rounded-lg shadow-xs transition text-xs flex items-center space-x-2"
                         >
-                          {st}
+                          <span>Advance to Next Step: "{nextStatus}"</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
                         </button>
-                      ))}
+                      ) : (
+                        <span className="inline-flex items-center space-x-1 bg-emerald-50 text-emerald-700 font-bold px-3 py-1.5 rounded-lg border border-emerald-200 text-xs">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                          <span>Order Delivery Completed</span>
+                        </span>
+                      )}
+                    </div>
+
+                    {/* SEQUENTIAL STATUS DROPDOWN ENFORCEMENT */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                        Sequential Status Progression Dropdown (No Steps Skipped):
+                      </label>
+                      <div className="flex items-center space-x-3">
+                        <select
+                          value={activeOrder.status}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val !== activeOrder.status) {
+                              handleAdvanceSequentialStatus(val);
+                            }
+                          }}
+                          disabled={isCompleted}
+                          className="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-xs font-semibold focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 focus:outline-none bg-white"
+                        >
+                          {/* Current Status */}
+                          <option value={activeOrder.status} disabled>
+                            Current: {activeOrder.status} (Step {currentIdx + 1} of {trackingSequence.length})
+                          </option>
+
+                          {/* Next Sequential Step ONLY */}
+                          {nextStatus && (
+                            <option value={nextStatus}>
+                              ➜ Advance to Step {currentIdx + 2}: {nextStatus}
+                            </option>
+                          )}
+
+                          {/* Exception Terminal State */}
+                          {!isCompleted && (
+                            <option value="Failed">
+                              ⚠ Flag Exception: Mark as Failed / Delivery Exception
+                            </option>
+                          )}
+                        </select>
+
+                        {nextStatus && (
+                          <button
+                            onClick={() => handleAdvanceSequentialStatus(nextStatus)}
+                            className="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-3 py-2 rounded-lg text-xs transition"
+                          >
+                            Advance ➔
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-400 mt-1.5">
+                        * Note: Status can only advance to the immediate next step in the pipeline. Skipped steps are restricted to maintain logistics integrity.
+                      </p>
                     </div>
                   </div>
                 </div>
