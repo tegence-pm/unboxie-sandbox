@@ -6,7 +6,7 @@ import Flow2Logistics from './components/Flow2Logistics';
 import Flow3Checkout from './components/Flow3Checkout';
 import Flow4Feedback from './components/Flow4Feedback';
 import FlowOverviewLanding from './components/FlowOverviewLanding';
-import InteractiveTourBanner, { TOUR_STEPS } from './components/InteractiveTourBanner';
+import InteractiveTourModal, { TOUR_STEPS } from './components/InteractiveTourModal';
 
 import {
   initialProducts,
@@ -17,7 +17,7 @@ import {
   initialFeedback
 } from './data/initialData';
 
-import { Eye, Home, ShoppingBag } from 'lucide-react';
+import { Eye, Home, Play, Sparkles } from 'lucide-react';
 
 export default function App() {
   // Global Shared State
@@ -28,7 +28,7 @@ export default function App() {
   const [shipments, setShipments] = useState(initialShipments);
   const [feedbackList, setFeedbackList] = useState(initialFeedback);
 
-  // Guided Tour State
+  // Guided Tour Modal State
   const [isTourActive, setIsTourActive] = useState(false);
   const [tourStepIndex, setTourStepIndex] = useState(0);
 
@@ -124,6 +124,10 @@ export default function App() {
     navigateToTourStep(0);
   };
 
+  const closeGuidedTour = () => {
+    setIsTourActive(false);
+  };
+
   // Handle completing checkout flow
   const handleCompleteCheckout = (orderData) => {
     const newOrderId = `#${Math.floor(100000 + Math.random() * 900000)}`;
@@ -150,12 +154,13 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900">
-      {/* Persistent Guided Tour Banner when active */}
+      {/* Prominent Floating Tour Modal when active */}
       {isTourActive && (
-        <InteractiveTourBanner
+        <InteractiveTourModal
           currentStepIndex={tourStepIndex}
           onNavigateStep={navigateToTourStep}
           onRestartTour={restartGuidedTour}
+          onCloseTour={closeGuidedTour}
         />
       )}
 
@@ -178,9 +183,10 @@ export default function App() {
             <div className="flex items-center space-x-3 text-xs font-semibold">
               <button
                 onClick={startGuidedTour}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition font-bold"
+                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition font-bold flex items-center space-x-1.5 shadow-xs"
               >
-                Start Guided Tour ▶
+                <Play className="w-3.5 h-3.5 fill-white" />
+                <span>Start Guided Tour Modal</span>
               </button>
               <button
                 onClick={() => setMainMode('admin')}
@@ -237,6 +243,15 @@ export default function App() {
             </div>
 
             <div className="flex items-center space-x-2">
+              {!isTourActive && (
+                <button
+                  onClick={startGuidedTour}
+                  className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center space-x-1"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Start Guided Tour</span>
+                </button>
+              )}
               <button
                 onClick={() => setMainMode('overview')}
                 className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition border border-slate-200 flex items-center space-x-1.5"
@@ -274,13 +289,24 @@ export default function App() {
           onSwitchToCustomer={() => setMainMode('customer')}
         >
           <div className="mb-4 flex justify-between items-center border-b border-slate-100 pb-3">
-            <button
-              onClick={() => setMainMode('overview')}
-              className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80 px-2.5 py-1 rounded-lg transition border border-slate-200/60"
-            >
-              <Home className="w-3.5 h-3.5 text-slate-400" />
-              <span>← Landing Overview</span>
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setMainMode('overview')}
+                className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80 px-2.5 py-1 rounded-lg transition border border-slate-200/60"
+              >
+                <Home className="w-3.5 h-3.5 text-slate-400" />
+                <span>← Landing Overview</span>
+              </button>
+              {!isTourActive && (
+                <button
+                  onClick={startGuidedTour}
+                  className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-3 py-1 rounded-lg transition flex items-center space-x-1 shadow-xs"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Launch Guided Tour</span>
+                </button>
+              )}
+            </div>
             <span className="text-[11px] text-slate-400 font-mono">
               Admin View Mode: <strong className="text-slate-700 capitalize">{adminTab}</strong>
             </span>
@@ -342,19 +368,6 @@ export default function App() {
                 setAdminTab('orders');
               }}
             />
-          )}
-
-          {/* OTHER PLACEHOLDER TABS */}
-          {['dashboard', 'categories', 'occasions'].includes(adminTab) && (
-            <div className="py-12 text-center space-y-3">
-              <ShoppingBag className="w-10 h-10 text-slate-300 mx-auto" />
-              <h2 className="text-base font-bold text-slate-800 capitalize">{adminTab} Module</h2>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Select <button onClick={() => setAdminTab('orders')} className="text-orange-600 font-bold hover:underline">Orders</button>, 
-                <button onClick={() => setAdminTab('products')} className="text-orange-600 font-bold ml-1 hover:underline">Products</button>, or 
-                <button onClick={() => setAdminTab('logistics')} className="text-orange-600 font-bold ml-1 hover:underline">Delivery Settings</button> to test core flows.
-              </p>
-            </div>
           )}
         </AdminLayout>
       )}
