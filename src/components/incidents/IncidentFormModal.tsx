@@ -94,8 +94,6 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
   const [description, setDescription] = useState('');
   const [cost, setCost] = useState<number | ''>('');
   const [costCoveredBy, setCostCoveredBy] = useState<CostBearer>('Vendor');
-  const [vendorSplit, setVendorSplit] = useState<number | ''>('');
-  const [unboxieSplit, setUnboxieSplit] = useState<number | ''>('');
   const [status, setStatus] = useState<IncidentStatus>('Resolved');
 
   // Selected Order object to populate items
@@ -111,8 +109,6 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
       setDescription(incidentToEdit.description);
       setCost(incidentToEdit.cost);
       setCostCoveredBy(incidentToEdit.costCoveredBy);
-      setVendorSplit(incidentToEdit.costSplitDetails?.vendorAmount ?? '');
-      setUnboxieSplit(incidentToEdit.costSplitDetails?.unboxieAmount ?? '');
       setStatus(incidentToEdit.status);
     } else {
       const initialOrderId = prefillOrderId || (orders[0]?.id || '');
@@ -131,8 +127,6 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
       setDescription('');
       setCost('');
       setCostCoveredBy('Vendor');
-      setVendorSplit('');
-      setUnboxieSplit('');
       setStatus('Resolved');
     }
   }, [incidentToEdit, prefillOrderId, prefillVendorId, prefillItemId, prefillItemName, isOpen, orders, vendors]);
@@ -177,14 +171,6 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
     const ven = vendors.find(v => v.id === vendorId);
     const costNum = Number(cost) || 0;
 
-    let costSplitDetails = undefined;
-    if (costCoveredBy === 'Split') {
-      costSplitDetails = {
-        vendorAmount: Number(vendorSplit) || 0,
-        unboxieAmount: Number(unboxieSplit) || 0,
-      };
-    }
-
     if (incidentToEdit) {
       updateIncident(incidentToEdit.id, {
         orderId,
@@ -197,7 +183,6 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
         description: description.trim(),
         cost: costNum,
         costCoveredBy,
-        costSplitDetails,
         status,
       });
     } else {
@@ -212,7 +197,6 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
         description: description.trim(),
         cost: costNum,
         costCoveredBy,
-        costSplitDetails,
         status,
       });
     }
@@ -404,40 +388,11 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
                 onChange={e => setCostCoveredBy(e.target.value as CostBearer)}
                 className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 shadow-2xs font-semibold text-slate-800"
               >
-                <option value="Vendor">Vendor (Vendor absorbed / replaced)</option>
-                <option value="Unboxie">Unboxie (Unboxie absorbed cost)</option>
-                <option value="Split">Split between Vendor & Unboxie</option>
+                <option value="Vendor">Vendor (Vendor absorbed)</option>
+                <option value="Unboxie">Unboxie (Unboxie absorbed)</option>
               </select>
             </div>
           </div>
-
-          {/* Split inputs if Split is chosen */}
-          {costCoveredBy === 'Split' && (
-            <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-white border border-slate-200 text-xs shadow-2xs">
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">Vendor Portion (₦)</label>
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  value={vendorSplit}
-                  onChange={e => setVendorSplit(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-500/20"
-                />
-              </div>
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">Unboxie Portion (₦)</label>
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  value={unboxieSplit}
-                  onChange={e => setUnboxieSplit(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-500/20"
-                />
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Footer Actions */}

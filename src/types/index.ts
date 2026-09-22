@@ -111,7 +111,7 @@ export interface Order {
   notes?: string;
 }
 
-export type CostBearer = 'Unboxie' | 'Vendor' | 'Split';
+export type CostBearer = 'Unboxie' | 'Vendor';
 export type IncidentStatus = 'Open' | 'Resolved';
 
 export type IssueType =
@@ -137,10 +137,6 @@ export interface Incident {
   description: string;
   cost: number; // in Naira (₦)
   costCoveredBy: CostBearer;
-  costSplitDetails?: {
-    unboxieAmount: number;
-    vendorAmount: number;
-  };
   status: IncidentStatus;
   createdAt: string;
 }

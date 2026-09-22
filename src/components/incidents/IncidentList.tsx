@@ -60,9 +60,6 @@ export const IncidentList: React.FC = () => {
       vendorCoveredTotal += inc.cost || 0;
     } else if (inc.costCoveredBy === 'Unboxie') {
       unboxieCoveredTotal += inc.cost || 0;
-    } else if (inc.costCoveredBy === 'Split' && inc.costSplitDetails) {
-      vendorCoveredTotal += inc.costSplitDetails.vendorAmount || 0;
-      unboxieCoveredTotal += inc.costSplitDetails.unboxieAmount || 0;
     }
   });
 
@@ -109,21 +106,18 @@ export const IncidentList: React.FC = () => {
         <StatCard
           title="Total Quality Loss"
           value={formatNaira(totalCost)}
-          subtitle="Cumulative issue cost"
           icon={DollarSign}
           variant="danger"
         />
         <StatCard
           title="Recovered by Vendors"
           value={formatNaira(vendorCoveredTotal)}
-          subtitle="Vendor absorbed / refunded"
           icon={CheckCircle2}
           variant="success"
         />
         <StatCard
           title="Absorbed by Unboxie"
           value={formatNaira(unboxieCoveredTotal)}
-          subtitle="Direct operational loss"
           icon={HelpCircle}
           variant="warning"
         />
@@ -137,7 +131,7 @@ export const IncidentList: React.FC = () => {
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Search incidents by order #, vendor, item, or description..."
+              placeholder="Search incidents by order #, vendor, product, or description..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all placeholder:text-slate-400"
@@ -164,7 +158,6 @@ export const IncidentList: React.FC = () => {
               <option value="all">All Cost Bearers</option>
               <option value="Vendor">Covered by Vendor</option>
               <option value="Unboxie">Covered by Unboxie</option>
-              <option value="Split">Split Coverage</option>
             </select>
 
             <select
@@ -266,9 +259,7 @@ export const IncidentList: React.FC = () => {
                       <span className={`inline-block text-[11px] font-semibold px-2.5 py-1 rounded-full ${
                         inc.costCoveredBy === 'Vendor' 
                           ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                          : inc.costCoveredBy === 'Unboxie'
-                          ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                          : 'bg-purple-50 text-purple-700 border border-purple-200'
+                          : 'bg-rose-50 text-rose-700 border border-rose-200'
                       }`}>
                         {inc.costCoveredBy}
                       </span>

@@ -44,7 +44,7 @@ export const VendorDetailPage: React.FC<VendorDetailPageProps> = ({ vendorId }) 
     setOrderSubTab
   } = useApp();
 
-  const [activeTab, setActiveTabLocal] = useState<'products' | 'orders' | 'incidents' | 'overview'>('products');
+  const [activeTab, setActiveTabLocal] = useState<'overview' | 'products' | 'orders' | 'incidents'>('overview');
   const [isIncidentModalOpen, setIsIncidentModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isToggleStatusModalOpen, setIsToggleStatusModalOpen] = useState(false);
@@ -280,6 +280,17 @@ export const VendorDetailPage: React.FC<VendorDetailPageProps> = ({ vendorId }) 
         <div className="flex items-center justify-between border-b border-slate-200 px-6 pt-4 bg-slate-50/50">
           <div className="flex items-center space-x-2">
             <button
+              onClick={() => setActiveTabLocal('overview')}
+              className={`flex items-center gap-2 pb-3.5 px-3 text-xs font-bold border-b-2 transition-all ${
+                activeTab === 'overview'
+                  ? 'border-brand-500 text-brand-600 font-extrabold'
+                  : 'border-transparent text-slate-500 hover:text-slate-900'
+              }`}
+            >
+              <span>Contact & Overview</span>
+            </button>
+
+            <button
               onClick={() => setActiveTabLocal('products')}
               className={`flex items-center gap-2 pb-3.5 px-3 text-xs font-bold border-b-2 transition-all ${
                 activeTab === 'products'
@@ -313,17 +324,6 @@ export const VendorDetailPage: React.FC<VendorDetailPageProps> = ({ vendorId }) 
             >
               <AlertTriangle className="w-4 h-4" />
               <span>Quality Incidents ({incidents.length})</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTabLocal('overview')}
-              className={`flex items-center gap-2 pb-3.5 px-3 text-xs font-bold border-b-2 transition-all ${
-                activeTab === 'overview'
-                  ? 'border-brand-500 text-brand-600 font-extrabold'
-                  : 'border-transparent text-slate-500 hover:text-slate-900'
-              }`}
-            >
-              <span>Contact & Overview</span>
             </button>
           </div>
 

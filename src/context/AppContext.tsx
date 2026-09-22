@@ -400,9 +400,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         costCoveredByVendor += inc.cost || 0;
       } else if (inc.costCoveredBy === 'Unboxie') {
         costCoveredByUnboxie += inc.cost || 0;
-      } else if (inc.costCoveredBy === 'Split' && inc.costSplitDetails) {
-        costCoveredByVendor += inc.costSplitDetails.vendorAmount || 0;
-        costCoveredByUnboxie += inc.costSplitDetails.unboxieAmount || 0;
       }
     });
 
