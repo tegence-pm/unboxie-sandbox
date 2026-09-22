@@ -232,12 +232,10 @@ export const OrderDetailPage: React.FC<OrderDetailPageProps> = ({ orderId }) => 
           <div className="p-2 rounded-xl bg-brand-500 text-white flex-shrink-0 mt-0.5">
             <Sparkles className="w-4 h-4" />
           </div>
-          <div className="text-xs">
-            <h4 className="font-bold text-slate-900">Ops Sourcing Action Required</h4>
-            <p className="text-slate-600 mt-0.5">
-              Check the pre-linked alternative vendors for each line item below. Once you confirm availability offline, 
-              select the vendor used. The system will automatically update the vendor's sourcing volume and last sourced timestamp.
-            </p>
+          <div className="text-xs self-center">
+            <h4 className="font-bold text-slate-900">
+              We need you to select vendors for the items listed below
+            </h4>
           </div>
         </div>
       )}
@@ -512,10 +510,10 @@ export const OrderDetailPage: React.FC<OrderDetailPageProps> = ({ orderId }) => 
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
                   <Package className="w-3.5 h-3.5 text-brand-500" />
-                  Order Products & Sourcing Allocation
+                  Order Products
                 </h3>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Select the vendor you sourced each product from after confirming availability.
+                  Please slect the vendor responsible for handling this products
                 </p>
               </div>
 
@@ -751,10 +749,10 @@ export const OrderDetailPage: React.FC<OrderDetailPageProps> = ({ orderId }) => 
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
                   <Layers className="w-3.5 h-3.5 text-purple-600" />
-                  Order Packaging Box & Sourcing Allocation
+                  Order Packaging Box
                 </h3>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Select the vendor you sourced the packaging box from after confirming stock and specifications.
+                  Please slect the vendor responsible for handling this packaging box
                 </p>
               </div>
             </div>
@@ -959,10 +957,10 @@ export const OrderDetailPage: React.FC<OrderDetailPageProps> = ({ orderId }) => 
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
                   <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
-                  Order Incidents & Defect Log ({orderIncidents.length})
+                  Order Incidents ({orderIncidents.length})
                 </h3>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Quality defects and supplier handoff issues recorded for this order.
+                  issues noticed while handing this order
                 </p>
               </div>
 

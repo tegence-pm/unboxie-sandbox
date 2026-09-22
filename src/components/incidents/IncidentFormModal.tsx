@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { useApp } from '../../context/AppContext';
-import { Modal } from '../common/Modal';
-import { CostBearer, IncidentStatus, Incident, IssueType } from '../../types';
-import { 
-  AlertCircle, 
-  DollarSign, 
-  ShoppingBag, 
-  Store, 
+import React, { useState, useEffect } from "react";
+import { useApp } from "../../context/AppContext";
+import { Modal } from "../common/Modal";
+import { CostBearer, IncidentStatus, Incident, IssueType } from "../../types";
+import {
+  AlertCircle,
+  DollarSign,
+  ShoppingBag,
+  Store,
   Info,
   CheckCircle2,
-  Clock
-} from 'lucide-react';
+  Clock,
+} from "lucide-react";
 
 interface IncidentFormModalProps {
   isOpen: boolean;
@@ -22,51 +22,55 @@ interface IncidentFormModalProps {
   prefillItemName?: string;
 }
 
-const ISSUE_TYPE_OPTIONS: { value: IssueType; label: string; description: string }[] = [
+const ISSUE_TYPE_OPTIONS: {
+  value: IssueType;
+  label: string;
+  description: string;
+}[] = [
   {
-    value: 'Damaged Product',
-    label: 'Damaged Product',
-    description: 'Arrived broken, scratched, or defective.',
+    value: "Damaged Product",
+    label: "Damaged Product",
+    description: "Arrived broken, scratched, or defective.",
   },
   {
-    value: 'Wrong Colour',
-    label: 'Wrong Colour',
-    description: 'Delivered an incorrect color variant.',
+    value: "Wrong Colour",
+    label: "Wrong Colour",
+    description: "Delivered an incorrect color variant.",
   },
   {
-    value: 'Wrong Quantity',
-    label: 'Wrong Quantity',
-    description: 'Delivered fewer or more items than purchased.',
+    value: "Wrong Quantity",
+    label: "Wrong Quantity",
+    description: "Delivered fewer or more items than purchased.",
   },
   {
-    value: 'Incomplete Product',
-    label: 'Incomplete Product',
-    description: 'Missing components or accessories.',
+    value: "Incomplete Product",
+    label: "Incomplete Product",
+    description: "Missing components or accessories.",
   },
   {
-    value: 'Different Product',
-    label: 'Different Product',
-    description: 'Delivered the wrong item entirely.',
+    value: "Different Product",
+    label: "Different Product",
+    description: "Delivered the wrong item entirely.",
   },
   {
-    value: 'Vendor Delay',
-    label: 'Vendor Delay',
-    description: 'Supplier missed the agreed handoff time.',
+    value: "Vendor Delay",
+    label: "Vendor Delay",
+    description: "Supplier missed the agreed handoff time.",
   },
   {
-    value: 'Additional Cost Incurred',
-    label: 'Additional Cost Incurred',
-    description: 'Sourcing required unforeseen extra expenses.',
+    value: "Additional Cost Incurred",
+    label: "Additional Cost Incurred",
+    description: "Sourcing required unforeseen extra expenses.",
   },
   {
-    value: 'Unexpected Vendor Cancellation',
-    label: 'Unexpected Vendor Cancellation',
-    description: 'Supplier backed out after accepting the order.',
+    value: "Unexpected Vendor Cancellation",
+    label: "Unexpected Vendor Cancellation",
+    description: "Supplier backed out after accepting the order.",
   },
   {
-    value: 'Other',
-    label: 'Other',
-    description: 'Custom or miscellaneous fulfillment issue.',
+    value: "Other",
+    label: "Other",
+    description: "Custom or miscellaneous fulfillment issue.",
   },
 ];
 
@@ -79,62 +83,74 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
   prefillItemId,
   prefillItemName,
 }) => {
-  const { 
-    addIncident, 
-    updateIncident, 
-    orders, 
-    vendors 
-  } = useApp();
+  const { addIncident, updateIncident, orders, vendors } = useApp();
 
-  const [orderId, setOrderId] = useState('');
-  const [vendorId, setVendorId] = useState('');
-  const [itemId, setItemId] = useState('');
-  const [itemName, setItemName] = useState('');
-  const [issueType, setIssueType] = useState<IssueType>('Damaged Product');
-  const [description, setDescription] = useState('');
-  const [cost, setCost] = useState<number | ''>('');
-  const [costCoveredBy, setCostCoveredBy] = useState<CostBearer>('Vendor');
-  const [status, setStatus] = useState<IncidentStatus>('Resolved');
+  const [orderId, setOrderId] = useState("");
+  const [vendorId, setVendorId] = useState("");
+  const [itemId, setItemId] = useState("");
+  const [itemName, setItemName] = useState("");
+  const [issueType, setIssueType] = useState<IssueType>("Damaged Product");
+  const [description, setDescription] = useState("");
+  const [cost, setCost] = useState<number | "">("");
+  const [costCoveredBy, setCostCoveredBy] = useState<CostBearer>("Vendor");
+  const [status, setStatus] = useState<IncidentStatus>("Resolved");
 
   // Selected Order object to populate items
-  const selectedOrder = orders.find(o => o.id === orderId);
+  const selectedOrder = orders.find((o) => o.id === orderId);
 
   useEffect(() => {
     if (incidentToEdit) {
       setOrderId(incidentToEdit.orderId);
       setVendorId(incidentToEdit.vendorId);
-      setItemId(incidentToEdit.itemId || '');
+      setItemId(incidentToEdit.itemId || "");
       setItemName(incidentToEdit.itemName);
-      setIssueType((incidentToEdit.issueType as IssueType) || 'Damaged Product');
+      setIssueType(
+        (incidentToEdit.issueType as IssueType) || "Damaged Product",
+      );
       setDescription(incidentToEdit.description);
       setCost(incidentToEdit.cost);
       setCostCoveredBy(incidentToEdit.costCoveredBy);
       setStatus(incidentToEdit.status);
     } else {
-      const initialOrderId = prefillOrderId || (orders[0]?.id || '');
+      const initialOrderId = prefillOrderId || orders[0]?.id || "";
       setOrderId(initialOrderId);
-      
-      const order = orders.find(o => o.id === initialOrderId);
-      const firstItem = order?.items.find(i => (prefillItemId ? i.id === prefillItemId : true)) || order?.items[0];
-      
-      setItemId(prefillItemId || (firstItem?.id || ''));
-      setItemName(prefillItemName || (firstItem?.name || 'General Order Fulfillment Issue'));
-      
-      const autoVendorId = prefillVendorId || firstItem?.sourcedVendorId || (vendors[0]?.id || '');
+
+      const order = orders.find((o) => o.id === initialOrderId);
+      const firstItem =
+        order?.items.find((i) =>
+          prefillItemId ? i.id === prefillItemId : true,
+        ) || order?.items[0];
+
+      setItemId(prefillItemId || firstItem?.id || "");
+      setItemName(
+        prefillItemName || firstItem?.name || "General Order Fulfillment Issue",
+      );
+
+      const autoVendorId =
+        prefillVendorId || firstItem?.sourcedVendorId || vendors[0]?.id || "";
       setVendorId(autoVendorId);
 
-      setIssueType('Damaged Product');
-      setDescription('');
-      setCost('');
-      setCostCoveredBy('Vendor');
-      setStatus('Resolved');
+      setIssueType("Damaged Product");
+      setDescription("");
+      setCost("");
+      setCostCoveredBy("Vendor");
+      setStatus("Resolved");
     }
-  }, [incidentToEdit, prefillOrderId, prefillVendorId, prefillItemId, prefillItemName, isOpen, orders, vendors]);
+  }, [
+    incidentToEdit,
+    prefillOrderId,
+    prefillVendorId,
+    prefillItemId,
+    prefillItemName,
+    isOpen,
+    orders,
+    vendors,
+  ]);
 
   // When order changes in dropdown, auto update available items
   const handleOrderChange = (newOrderId: string) => {
     setOrderId(newOrderId);
-    const ord = orders.find(o => o.id === newOrderId);
+    const ord = orders.find((o) => o.id === newOrderId);
     if (ord && ord.items.length > 0) {
       const first = ord.items[0];
       setItemId(first.id);
@@ -148,10 +164,10 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
   // When product/item changes in dropdown, auto pick the responsible vendor if assigned
   const handleItemChange = (newItemId: string) => {
     setItemId(newItemId);
-    if (newItemId === 'general') {
-      setItemName('General Order Fulfillment Issue');
+    if (newItemId === "general") {
+      setItemName("General Order Fulfillment Issue");
     } else if (selectedOrder) {
-      const it = selectedOrder.items.find(i => i.id === newItemId);
+      const it = selectedOrder.items.find((i) => i.id === newItemId);
       if (it) {
         setItemName(it.name);
         if (it.sourcedVendorId) {
@@ -161,24 +177,26 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
     }
   };
 
-  const selectedIssueTypeMeta = ISSUE_TYPE_OPTIONS.find(opt => opt.value === issueType);
+  const selectedIssueTypeMeta = ISSUE_TYPE_OPTIONS.find(
+    (opt) => opt.value === issueType,
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!orderId || !vendorId || !description.trim()) return;
 
-    const ord = orders.find(o => o.id === orderId);
-    const ven = vendors.find(v => v.id === vendorId);
+    const ord = orders.find((o) => o.id === orderId);
+    const ven = vendors.find((v) => v.id === vendorId);
     const costNum = Number(cost) || 0;
 
     if (incidentToEdit) {
       updateIncident(incidentToEdit.id, {
         orderId,
-        orderNumber: ord?.orderNumber || 'ORD-N/A',
+        orderNumber: ord?.orderNumber || "ORD-N/A",
         vendorId,
-        vendorName: ven?.name || 'Unknown Vendor',
+        vendorName: ven?.name || "Unknown Vendor",
         itemId: itemId || undefined,
-        itemName: itemName || 'Order Item',
+        itemName: itemName || "Order Item",
         issueType,
         description: description.trim(),
         cost: costNum,
@@ -188,11 +206,11 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
     } else {
       addIncident({
         orderId,
-        orderNumber: ord?.orderNumber || 'ORD-N/A',
+        orderNumber: ord?.orderNumber || "ORD-N/A",
         vendorId,
-        vendorName: ven?.name || 'Unknown Vendor',
+        vendorName: ven?.name || "Unknown Vendor",
         itemId: itemId || undefined,
-        itemName: itemName || 'Order Item',
+        itemName: itemName || "Order Item",
         issueType,
         description: description.trim(),
         cost: costNum,
@@ -208,12 +226,11 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={incidentToEdit ? 'Edit Fulfillment Incident' : 'Record Order Incident'}
+      title={incidentToEdit ? "Edit Order Incident" : "Record Order Incident"}
       subtitle="Log fulfillment defects, responsible vendor, and cost liability."
       maxWidth="2xl"
     >
       <form onSubmit={handleSubmit} className="space-y-5 pt-1">
-        
         {/* Section 1: Order & Sourcing Details */}
         <div className="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-4 space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-slate-200/60 text-xs font-bold uppercase tracking-wider text-slate-600">
@@ -228,10 +245,10 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
               </label>
               <select
                 value={orderId}
-                onChange={e => handleOrderChange(e.target.value)}
+                onChange={(e) => handleOrderChange(e.target.value)}
                 className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 shadow-2xs font-medium text-slate-800"
               >
-                {orders.map(o => (
+                {orders.map((o) => (
                   <option key={o.id} value={o.id}>
                     {o.orderNumber} — {o.customerName}
                   </option>
@@ -245,10 +262,10 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
               </label>
               <select
                 value={itemId}
-                onChange={e => handleItemChange(e.target.value)}
+                onChange={(e) => handleItemChange(e.target.value)}
                 className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 shadow-2xs text-slate-800"
               >
-                {selectedOrder?.items.map(it => (
+                {selectedOrder?.items.map((it) => (
                   <option key={it.id} value={it.id}>
                     {it.name} (x{it.quantity})
                   </option>
@@ -265,10 +282,10 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
             <div className="relative">
               <select
                 value={vendorId}
-                onChange={e => setVendorId(e.target.value)}
+                onChange={(e) => setVendorId(e.target.value)}
                 className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 shadow-2xs font-semibold text-slate-900"
               >
-                {vendors.map(v => (
+                {vendors.map((v) => (
                   <option key={v.id} value={v.id}>
                     {v.name} ({v.type})
                   </option>
@@ -291,11 +308,11 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
             <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
               <button
                 type="button"
-                onClick={() => setStatus('Open')}
+                onClick={() => setStatus("Open")}
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-                  status === 'Open'
-                    ? 'bg-amber-500 text-white shadow-2xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                  status === "Open"
+                    ? "bg-amber-500 text-white shadow-2xs"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 <Clock className="w-3 h-3" />
@@ -303,11 +320,11 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
               </button>
               <button
                 type="button"
-                onClick={() => setStatus('Resolved')}
+                onClick={() => setStatus("Resolved")}
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-                  status === 'Resolved'
-                    ? 'bg-emerald-600 text-white shadow-2xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                  status === "Resolved"
+                    ? "bg-emerald-600 text-white shadow-2xs"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 <CheckCircle2 className="w-3 h-3" />
@@ -322,10 +339,10 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
             </label>
             <select
               value={issueType}
-              onChange={e => setIssueType(e.target.value as IssueType)}
+              onChange={(e) => setIssueType(e.target.value as IssueType)}
               className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 shadow-2xs font-semibold text-slate-900"
             >
-              {ISSUE_TYPE_OPTIONS.map(opt => (
+              {ISSUE_TYPE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
                   {opt.label}
                 </option>
@@ -348,7 +365,7 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
               rows={3}
               placeholder="Detail specifically what went wrong, condition on arrival, or timeline issues..."
               value={description}
-              onChange={e => setDescription(e.target.value)}
+              onChange={(e) => setDescription(e.target.value)}
               className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 shadow-2xs resize-none"
             />
           </div>
@@ -367,13 +384,17 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
                 Cost Incurred (₦)
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-2 text-xs font-bold text-slate-400">₦</span>
+                <span className="absolute left-3 top-2 text-xs font-bold text-slate-400">
+                  ₦
+                </span>
                 <input
                   type="number"
                   min="0"
                   placeholder="0"
                   value={cost}
-                  onChange={e => setCost(e.target.value === '' ? '' : Number(e.target.value))}
+                  onChange={(e) =>
+                    setCost(e.target.value === "" ? "" : Number(e.target.value))
+                  }
                   className="w-full pl-7 pr-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 shadow-2xs font-semibold text-slate-900"
                 />
               </div>
@@ -385,7 +406,7 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
               </label>
               <select
                 value={costCoveredBy}
-                onChange={e => setCostCoveredBy(e.target.value as CostBearer)}
+                onChange={(e) => setCostCoveredBy(e.target.value as CostBearer)}
                 className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 shadow-2xs font-semibold text-slate-800"
               >
                 <option value="Vendor">Vendor (Vendor absorbed)</option>
@@ -408,7 +429,7 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
             type="submit"
             className="px-5 py-2 text-xs sm:text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 rounded-xl shadow-xs transition-all cursor-pointer"
           >
-            {incidentToEdit ? 'Save Changes' : 'Record Incident'}
+            {incidentToEdit ? "Save Changes" : "Record Incident"}
           </button>
         </div>
       </form>

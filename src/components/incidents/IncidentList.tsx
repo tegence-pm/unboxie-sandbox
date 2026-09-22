@@ -1,50 +1,49 @@
-import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
-import { IncidentFormModal } from './IncidentFormModal';
-import { ConfirmModal } from '../common/ConfirmModal';
-import { Incident } from '../../types';
-import { StatCard } from '../common/StatCard';
-import { 
-  AlertTriangle, 
-  Plus, 
-  Search, 
-  Building2, 
-  DollarSign, 
-  CheckCircle2, 
+import React, { useState } from "react";
+import { useApp } from "../../context/AppContext";
+import { IncidentFormModal } from "./IncidentFormModal";
+import { ConfirmModal } from "../common/ConfirmModal";
+import { Incident } from "../../types";
+import { StatCard } from "../common/StatCard";
+import {
+  AlertTriangle,
+  Plus,
+  Search,
+  Building2,
+  DollarSign,
+  CheckCircle2,
   ExternalLink,
   Edit3,
   Trash2,
-  HelpCircle
-} from 'lucide-react';
-import { formatNaira, formatRelativeTime } from '../../utils/formatters';
+  HelpCircle,
+} from "lucide-react";
+import { formatNaira, formatRelativeTime } from "../../utils/formatters";
 
 export const IncidentList: React.FC = () => {
-  const { 
-    incidents, 
-    vendors, 
-    deleteIncident, 
-    setCurrentView
-  } = useApp();
+  const { incidents, vendors, deleteIncident, setCurrentView } = useApp();
 
-  const [search, setSearch] = useState('');
-  const [vendorFilter, setVendorFilter] = useState('all');
-  const [bearerFilter, setBearerFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [search, setSearch] = useState("");
+  const [vendorFilter, setVendorFilter] = useState("all");
+  const [bearerFilter, setBearerFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [incidentToEdit, setIncidentToEdit] = useState<Incident | null>(null);
-  const [incidentToDelete, setIncidentToDelete] = useState<Incident | null>(null);
+  const [incidentToDelete, setIncidentToDelete] = useState<Incident | null>(
+    null,
+  );
 
-  const filteredIncidents = incidents.filter(inc => {
-    const matchesSearch = 
+  const filteredIncidents = incidents.filter((inc) => {
+    const matchesSearch =
       inc.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
       inc.vendorName.toLowerCase().includes(search.toLowerCase()) ||
       inc.itemName.toLowerCase().includes(search.toLowerCase()) ||
       inc.description.toLowerCase().includes(search.toLowerCase());
 
-    const matchesVendor = vendorFilter === 'all' || inc.vendorId === vendorFilter;
-    const matchesBearer = bearerFilter === 'all' || inc.costCoveredBy === bearerFilter;
-    const matchesStatus = statusFilter === 'all' || inc.status === statusFilter;
+    const matchesVendor =
+      vendorFilter === "all" || inc.vendorId === vendorFilter;
+    const matchesBearer =
+      bearerFilter === "all" || inc.costCoveredBy === bearerFilter;
+    const matchesStatus = statusFilter === "all" || inc.status === statusFilter;
 
     return matchesSearch && matchesVendor && matchesBearer && matchesStatus;
   });
@@ -54,11 +53,11 @@ export const IncidentList: React.FC = () => {
   let vendorCoveredTotal = 0;
   let unboxieCoveredTotal = 0;
 
-  incidents.forEach(inc => {
+  incidents.forEach((inc) => {
     totalCost += inc.cost || 0;
-    if (inc.costCoveredBy === 'Vendor') {
+    if (inc.costCoveredBy === "Vendor") {
       vendorCoveredTotal += inc.cost || 0;
-    } else if (inc.costCoveredBy === 'Unboxie') {
+    } else if (inc.costCoveredBy === "Unboxie") {
       unboxieCoveredTotal += inc.cost || 0;
     }
   });
@@ -70,7 +69,6 @@ export const IncidentList: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -78,7 +76,8 @@ export const IncidentList: React.FC = () => {
             Order Incidents
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Track order fulfillment defects, supplier liabilities, and loss recoveries.
+            Track order fulfillment defects, supplier liabilities, and loss
+            recoveries.
           </p>
         </div>
 
@@ -99,7 +98,7 @@ export const IncidentList: React.FC = () => {
         <StatCard
           title="Total Incidents"
           value={incidents.length}
-          subtitle={`${incidents.filter(i => i.status === 'Open').length} currently open`}
+          subtitle={`${incidents.filter((i) => i.status === "Open").length} currently open`}
           icon={AlertTriangle}
           variant="default"
         />
@@ -126,14 +125,13 @@ export const IncidentList: React.FC = () => {
       {/* Search & Filter Bar */}
       <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-subtle space-y-3">
         <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-          
           <div className="relative w-full md:flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Search incidents by order #, vendor, product, or description..."
+              placeholder="Search incidents by order #"
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all placeholder:text-slate-400"
             />
           </div>
@@ -141,18 +139,20 @@ export const IncidentList: React.FC = () => {
           <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto justify-between md:justify-end">
             <select
               value={vendorFilter}
-              onChange={e => setVendorFilter(e.target.value)}
+              onChange={(e) => setVendorFilter(e.target.value)}
               className="px-3 py-2 text-xs font-medium rounded-xl border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
             >
               <option value="all">All Vendors</option>
-              {vendors.map(v => (
-                <option key={v.id} value={v.id}>{v.name}</option>
+              {vendors.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.name}
+                </option>
               ))}
             </select>
 
             <select
               value={bearerFilter}
-              onChange={e => setBearerFilter(e.target.value)}
+              onChange={(e) => setBearerFilter(e.target.value)}
               className="px-3 py-2 text-xs font-medium rounded-xl border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
             >
               <option value="all">All Cost Bearers</option>
@@ -162,7 +162,7 @@ export const IncidentList: React.FC = () => {
 
             <select
               value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value)}
+              onChange={(e) => setStatusFilter(e.target.value)}
               className="px-3 py-2 text-xs font-medium rounded-xl border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
             >
               <option value="all">All Statuses</option>
@@ -177,9 +177,12 @@ export const IncidentList: React.FC = () => {
       {filteredIncidents.length === 0 ? (
         <div className="p-12 text-center rounded-2xl bg-white border border-dashed border-slate-300">
           <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto mb-3" />
-          <h3 className="text-base font-semibold text-slate-800">No incidents found</h3>
+          <h3 className="text-base font-semibold text-slate-800">
+            No incidents found
+          </h3>
           <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-            All orders are fulfilled cleanly without recorded quality disruptions.
+            All orders are fulfilled cleanly without recorded quality
+            disruptions.
           </p>
         </div>
       ) : (
@@ -199,13 +202,19 @@ export const IncidentList: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredIncidents.map(inc => (
-                  <tr key={inc.id} className="hover:bg-slate-50/60 transition-colors">
+                {filteredIncidents.map((inc) => (
+                  <tr
+                    key={inc.id}
+                    className="hover:bg-slate-50/60 transition-colors"
+                  >
                     {/* Order Number */}
                     <td className="py-3.5 px-4 whitespace-nowrap">
                       <button
                         onClick={() => {
-                          setCurrentView({ type: 'order-detail', id: inc.orderId });
+                          setCurrentView({
+                            type: "order-detail",
+                            id: inc.orderId,
+                          });
                         }}
                         className="font-bold text-brand-600 hover:text-brand-700 flex items-center gap-1 group"
                       >
@@ -233,7 +242,10 @@ export const IncidentList: React.FC = () => {
                     <td className="py-3.5 px-4 whitespace-nowrap">
                       <button
                         onClick={() => {
-                          setCurrentView({ type: 'vendor-detail', id: inc.vendorId });
+                          setCurrentView({
+                            type: "vendor-detail",
+                            id: inc.vendorId,
+                          });
                         }}
                         className="inline-flex items-center gap-1.5 font-semibold text-slate-800 hover:text-brand-600"
                       >
@@ -244,7 +256,10 @@ export const IncidentList: React.FC = () => {
 
                     {/* Description */}
                     <td className="py-3.5 px-4 max-w-xs">
-                      <p className="text-slate-600 truncate" title={inc.description}>
+                      <p
+                        className="text-slate-600 truncate"
+                        title={inc.description}
+                      >
                         {inc.description}
                       </p>
                     </td>
@@ -256,25 +271,33 @@ export const IncidentList: React.FC = () => {
 
                     {/* Cost Covered By */}
                     <td className="py-3.5 px-4 whitespace-nowrap">
-                      <span className={`inline-block text-[11px] font-semibold px-2.5 py-1 rounded-full ${
-                        inc.costCoveredBy === 'Vendor' 
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                          : 'bg-rose-50 text-rose-700 border border-rose-200'
-                      }`}>
+                      <span
+                        className={`inline-block text-[11px] font-semibold px-2.5 py-1 rounded-full ${
+                          inc.costCoveredBy === "Vendor"
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : "bg-rose-50 text-rose-700 border border-rose-200"
+                        }`}
+                      >
                         {inc.costCoveredBy}
                       </span>
                     </td>
 
                     {/* Status */}
                     <td className="py-3.5 px-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                        inc.status === 'Resolved'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-amber-50 text-amber-800 border border-amber-200'
-                      }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${
-                          inc.status === 'Resolved' ? 'bg-emerald-500' : 'bg-amber-500'
-                        }`} />
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                          inc.status === "Resolved"
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : "bg-amber-50 text-amber-800 border border-amber-200"
+                        }`}
+                      >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            inc.status === "Resolved"
+                              ? "bg-emerald-500"
+                              : "bg-amber-500"
+                          }`}
+                        />
                         <span>{inc.status}</span>
                       </span>
                     </td>
@@ -330,7 +353,6 @@ export const IncidentList: React.FC = () => {
         message={`Are you sure you want to delete the incident record for Order ${incidentToDelete?.orderNumber} (${incidentToDelete?.itemName})? This will update vendor stats accordingly.`}
         confirmText="Delete Record"
       />
-
     </div>
   );
 };
