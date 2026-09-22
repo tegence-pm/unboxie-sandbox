@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { useApp } from "../../context/AppContext";
 import { StatCard } from "../common/StatCard";
 import { MultiSelectDropdown } from "../common/MultiSelectDropdown";
-import { Building2, Plus, Search, Package, CheckCircle2 } from "lucide-react";
+import { Building2, Plus, Search, Package, CheckCircle2, ShieldCheck } from "lucide-react";
 
 export const VendorList: React.FC = () => {
-  const { vendors, setCurrentView } = useApp();
+  const { vendors, setCurrentView, getVendorPerformance } = useApp();
 
   // Filters state
   const [search, setSearch] = useState("");
@@ -231,70 +231,63 @@ export const VendorList: React.FC = () => {
                   <th className="py-3 px-4">VENDOR</th>
                   <th className="py-3 px-4">TYPE</th>
                   <th className="py-3 px-4">LOCATION</th>
-                  <th className="py-3 px-4">SOURCING STATS</th>
+                  <th className="py-3 px-4">TRUST SCORE</th>
                   <th className="py-3 px-4">STATUS</th>
                   <th className="py-3 px-4 text-right">ACTIONS</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredVendors.map((vendor) => (
-                  <tr
-                    key={vendor.id}
-                    className="hover:bg-slate-50/60 transition-colors cursor-pointer group"
-                    onClick={() =>
-                      setCurrentView({ type: "vendor-detail", id: vendor.id })
-                    }
-                  >
-                    {/* Vendor Name */}
-                    <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-orange-50 border border-brand-100 text-brand-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
-                          {vendor.name.charAt(0)}
+                {filteredVendors.map((vendor) => {
+                  const perf = getVendorPerformance(vendor.id);
+                  return (
+                    <tr
+                      key={vendor.id}
+                      className="hover:bg-slate-50/60 transition-colors cursor-pointer group"
+                      onClick={() =>
+                        setCurrentView({ type: "vendor-detail", id: vendor.id })
+                      }
+                    >
+                      {/* Vendor Name */}
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-orange-50 border border-brand-100 text-brand-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                            {vendor.name.charAt(0)}
+                          </div>
+                          <div className="min-w-0">
+                            <span className="font-bold text-slate-900 group-hover:text-brand-600 transition-colors block truncate">
+                              {vendor.name}
+                            </span>
+                          </div>
                         </div>
-                        <div className="min-w-0">
-                          <span className="font-bold text-slate-900 group-hover:text-brand-600 transition-colors block truncate">
-                            {vendor.name}
-                          </span>
+                      </td>
+
+                      {/* Type (Channel removed) */}
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <span className="font-medium text-slate-800">
+                          {vendor.type}
+                        </span>
+                      </td>
+
+                      {/* Location */}
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <span className="font-medium text-slate-800 block">
+                          {vendor.cityLga}
+                        </span>
+                        <span className="text-[11px] text-slate-400 block">
+                          {vendor.state}
+                        </span>
+                      </td>
+
+                      {/* Trust Score */}
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <div className="flex items-center gap-1.5 font-bold text-slate-900">
+                          <ShieldCheck className={`w-4 h-4 ${perf.reliabilityScore >= 90 ? 'text-emerald-600' : perf.reliabilityScore >= 75 ? 'text-amber-600' : 'text-rose-600'}`} />
+                          <span>{perf.reliabilityScore}%</span>
                         </div>
-                      </div>
-                    </td>
-
-                    {/* Type (Channel removed) */}
-                    <td className="py-3.5 px-4 whitespace-nowrap">
-                      <span className="font-medium text-slate-800">
-                        {vendor.type}
-                      </span>
-                    </td>
-
-                    {/* Location */}
-                    <td className="py-3.5 px-4 whitespace-nowrap">
-                      <span className="font-medium text-slate-800 block">
-                        {vendor.cityLga}
-                      </span>
-                      <span className="text-[11px] text-slate-400 block">
-                        {vendor.state}
-                      </span>
-                    </td>
-
-                    {/* Sourcing Stats */}
-                    <td className="py-3.5 px-4 whitespace-nowrap">
-                      <span className="font-bold text-slate-900 block">
-                        {vendor.timesUsed || 0} times used
-                      </span>
-                      {vendor.lastUsedDate ? (
-                        <span className="text-[10px] text-slate-400 block">
-                          Last:{" "}
-                          {new Date(vendor.lastUsedDate).toLocaleDateString(
-                            "en-GB",
-                            { day: "numeric", month: "short" },
-                          )}
+                        <span className="text-[10px] text-slate-400 block mt-0.5">
+                          {perf.issueCount === 0 ? "Flawless record" : `${perf.issueRate}% defect rate`}
                         </span>
-                      ) : (
-                        <span className="text-[10px] text-slate-400 block">
-                          Not used yet
-                        </span>
-                      )}
-                    </td>
+                      </td>
 
                     {/* Status */}
                     <td className="py-3.5 px-4 whitespace-nowrap">
@@ -347,7 +340,8 @@ export const VendorList: React.FC = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
+                );
+              })}
               </tbody>
             </table>
           </div>
