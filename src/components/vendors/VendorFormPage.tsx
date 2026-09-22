@@ -1,46 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import { useApp } from '../../context/AppContext';
-import { VendorType, VendorSource, VendorStatus } from '../../types';
-import { 
-  ArrowLeft, 
-  Building2, 
-  MapPin, 
-  Tag, 
-  FileText, 
-  X, 
-  Save 
-} from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useApp } from "../../context/AppContext";
+import { VendorType, VendorSource, VendorStatus } from "../../types";
+import {
+  ArrowLeft,
+  Building2,
+  MapPin,
+  Tag,
+  FileText,
+  X,
+  Save,
+} from "lucide-react";
 
 interface VendorFormPageProps {
   vendorId?: string;
 }
 
 const COMMON_CATEGORIES = [
-  'Diffusers',
-  'Candles',
-  'Fragrances',
-  'Keychains',
-  'Mugs & Drinkware',
-  'Stationery',
-  'Jewelry',
-  'Skincare & Wellness',
-  'Boxes & Packaging',
-  'Ribbons & Sleeves',
-  'Printing & Engraving',
-  'Silk & Pouches',
+  "Diffusers",
+  "Candles",
+  "Fragrances",
+  "Keychains",
+  "Mugs & Drinkware",
+  "Stationery",
+  "Jewelry",
+  "Skincare & Wellness",
+  "Boxes & Packaging",
+  "Ribbons & Sleeves",
+  "Printing & Engraving",
+  "Silk & Pouches",
 ];
 
 const NIGERIAN_STATES = [
-  'Lagos',
-  'FCT - Abuja',
-  'Ogun',
-  'Oyo',
-  'Rivers',
-  'Enugu',
-  'Kano',
-  'Delta',
-  'Edo',
-  'Anambra',
+  "Lagos",
+  "FCT - Abuja",
+  "Ogun",
+  "Oyo",
+  "Rivers",
+  "Enugu",
+  "Kano",
+  "Delta",
+  "Edo",
+  "Anambra",
 ];
 
 export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
@@ -48,17 +48,17 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
 
   const existingVendor = vendorId ? getVendorById(vendorId) : null;
 
-  const [name, setName] = useState('');
-  const [type, setType] = useState<VendorType>('Souvenir Vendor');
-  const [source, setSource] = useState<VendorSource>('Online');
-  const [phone, setPhone] = useState('');
-  const [state, setState] = useState('Lagos');
-  const [cityLga, setCityLga] = useState('');
-  const [address, setAddress] = useState('');
+  const [name, setName] = useState("");
+  const [type, setType] = useState<VendorType>("Souvenir Vendor");
+  const [source, setSource] = useState<VendorSource>("Online");
+  const [phone, setPhone] = useState("");
+  const [state, setState] = useState("Lagos");
+  const [cityLga, setCityLga] = useState("");
+  const [address, setAddress] = useState("");
   const [categories, setCategories] = useState<string[]>([]);
-  const [customCategory, setCustomCategory] = useState('');
-  const [notes, setNotes] = useState('');
-  const [status, setStatus] = useState<VendorStatus>('Active');
+  const [customCategory, setCustomCategory] = useState("");
+  const [notes, setNotes] = useState("");
+  const [status, setStatus] = useState<VendorStatus>("Active");
 
   useEffect(() => {
     if (existingVendor) {
@@ -70,14 +70,14 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
       setCityLga(existingVendor.cityLga);
       setAddress(existingVendor.address);
       setCategories(existingVendor.categories || []);
-      setNotes(existingVendor.notes || '');
+      setNotes(existingVendor.notes || "");
       setStatus(existingVendor.status);
     }
   }, [existingVendor]);
 
   const toggleCategory = (cat: string) => {
     if (categories.includes(cat)) {
-      setCategories(categories.filter(c => c !== cat));
+      setCategories(categories.filter((c) => c !== cat));
     } else {
       setCategories([...categories, cat]);
     }
@@ -87,7 +87,7 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
     e.preventDefault();
     if (customCategory.trim() && !categories.includes(customCategory.trim())) {
       setCategories([...categories, customCategory.trim()]);
-      setCustomCategory('');
+      setCustomCategory("");
     }
   };
 
@@ -108,7 +108,7 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
         notes: notes.trim(),
         status,
       });
-      setCurrentView({ type: 'vendor-detail', id: existingVendor.id });
+      setCurrentView({ type: "vendor-detail", id: existingVendor.id });
     } else {
       const created = addVendor({
         name: name.trim(),
@@ -122,22 +122,24 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
         notes: notes.trim(),
         status,
       });
-      setCurrentView({ type: 'vendor-detail', id: created.id });
+      setCurrentView({ type: "vendor-detail", id: created.id });
     }
   };
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12">
-      
       {/* Back button & Title */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <button
             onClick={() => {
               if (existingVendor) {
-                setCurrentView({ type: 'vendor-detail', id: existingVendor.id });
+                setCurrentView({
+                  type: "vendor-detail",
+                  id: existingVendor.id,
+                });
               } else {
-                setCurrentView({ type: 'vendor-list' });
+                setCurrentView({ type: "vendor-list" });
               }
             }}
             className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition-colors shadow-2xs"
@@ -146,23 +148,25 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
           </button>
           <div>
             <h1 className="text-2xl font-bold font-heading text-slate-900">
-              {existingVendor ? `Edit Vendor: ${existingVendor.name}` : 'Add New Vendor'}
+              {existingVendor
+                ? `Edit Vendor: ${existingVendor.name}`
+                : "Add New Vendor"}
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">
-              Configure supplier profile, product categories, and contact details.
+              Configure supplier profile, product categories, and contact
+              details.
             </p>
           </div>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        
         {/* Section 1: Business Profile */}
         <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-subtle space-y-4">
           <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
             <Building2 className="w-4 h-4 text-brand-500" />
             <h2 className="text-sm font-bold font-heading uppercase tracking-wider text-slate-900">
-              Business Profile & Sourcing Type
+              Business Profile
             </h2>
           </div>
 
@@ -176,7 +180,7 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
                 required
                 placeholder="e.g. Lagos Scent Co."
                 value={name}
-                onChange={e => setName(e.target.value)}
+                onChange={(e) => setName(e.target.value)}
                 className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
               />
             </div>
@@ -187,11 +191,15 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
               </label>
               <select
                 value={type}
-                onChange={e => setType(e.target.value as VendorType)}
+                onChange={(e) => setType(e.target.value as VendorType)}
                 className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all font-medium"
               >
-                <option value="Souvenir Vendor">Souvenir Vendor (Gift items & products)</option>
-                <option value="Customization Vendor">Customization Vendor (Printing, box sleeves, engraving)</option>
+                <option value="Souvenir Vendor">
+                  Souvenir Vendor (Gift items & products)
+                </option>
+                <option value="Customization Vendor">
+                  Customization Vendor (Printing, box sleeves, engraving)
+                </option>
               </select>
             </div>
           </div>
@@ -203,25 +211,33 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
               </label>
               <select
                 value={source}
-                onChange={e => setSource(e.target.value as VendorSource)}
+                onChange={(e) => setSource(e.target.value as VendorSource)}
                 className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
               >
-                <option value="Online">Online (Instagram, TikTok, Website)</option>
-                <option value="Offline">Offline (Shops, Markets, Referrals)</option>
+                <option value="Online">
+                  Online (Instagram, TikTok, Website)
+                </option>
+                <option value="Offline">
+                  Offline (Shops, Markets, Referrals)
+                </option>
               </select>
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                Network Status *
+                Availability Status *
               </label>
               <select
                 value={status}
-                onChange={e => setStatus(e.target.value as VendorStatus)}
+                onChange={(e) => setStatus(e.target.value as VendorStatus)}
                 className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all font-semibold"
               >
-                <option value="Active">Active (Currently used in active network)</option>
-                <option value="Inactive">Inactive (Not sourced recently)</option>
+                <option value="Active">
+                  Active (Currently used in active network)
+                </option>
+                <option value="Inactive">
+                  Inactive (Not sourced recently)
+                </option>
               </select>
             </div>
           </div>
@@ -245,7 +261,7 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
                 type="text"
                 placeholder="+234 800 000 0000"
                 value={phone}
-                onChange={e => setPhone(e.target.value)}
+                onChange={(e) => setPhone(e.target.value)}
                 className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
               />
             </div>
@@ -256,24 +272,26 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
               </label>
               <select
                 value={state}
-                onChange={e => setState(e.target.value)}
+                onChange={(e) => setState(e.target.value)}
                 className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20"
               >
-                {NIGERIAN_STATES.map(st => (
-                  <option key={st} value={st}>{st}</option>
+                {NIGERIAN_STATES.map((st) => (
+                  <option key={st} value={st}>
+                    {st}
+                  </option>
                 ))}
               </select>
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                City / LGA / Market Hub
+                City
               </label>
               <input
                 type="text"
                 placeholder="e.g. Lekki Phase 1, Yaba, Wuse II"
                 value={cityLga}
-                onChange={e => setCityLga(e.target.value)}
+                onChange={(e) => setCityLga(e.target.value)}
                 className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
               />
             </div>
@@ -287,7 +305,7 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
               type="text"
               placeholder="e.g. Shop 42, Tejuosho Ultra Modern Market, Yaba, Lagos"
               value={address}
-              onChange={e => setAddress(e.target.value)}
+              onChange={(e) => setAddress(e.target.value)}
               className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
             />
           </div>
@@ -304,11 +322,12 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
 
           <div className="space-y-3">
             <p className="text-xs text-slate-500">
-              Select category specialties or add custom tags to link products to this vendor.
+              Select category specialties or add custom tags to link products to
+              this vendor.
             </p>
 
             <div className="flex flex-wrap gap-2">
-              {COMMON_CATEGORIES.map(cat => {
+              {COMMON_CATEGORIES.map((cat) => {
                 const isSelected = categories.includes(cat);
                 return (
                   <button
@@ -317,11 +336,12 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
                     onClick={() => toggleCategory(cat)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
                       isSelected
-                        ? 'bg-brand-500 text-white border-brand-600 shadow-xs'
-                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                        ? "bg-brand-500 text-white border-brand-600 shadow-xs"
+                        : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
                     }`}
                   >
-                    {isSelected ? '✓ ' : '+ '}{cat}
+                    {isSelected ? "✓ " : "+ "}
+                    {cat}
                   </button>
                 );
               })}
@@ -333,9 +353,9 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
                 type="text"
                 placeholder="Add custom category tag..."
                 value={customCategory}
-                onChange={e => setCustomCategory(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
+                onChange={(e) => setCustomCategory(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
                     e.preventDefault();
                     handleAddCustomCategory(e);
                   }
@@ -352,11 +372,12 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
             </div>
 
             {/* Custom tags list */}
-            {categories.filter(c => !COMMON_CATEGORIES.includes(c)).length > 0 && (
+            {categories.filter((c) => !COMMON_CATEGORIES.includes(c)).length >
+              0 && (
               <div className="flex flex-wrap gap-1.5 pt-2">
                 {categories
-                  .filter(c => !COMMON_CATEGORIES.includes(c))
-                  .map(cat => (
+                  .filter((c) => !COMMON_CATEGORIES.includes(c))
+                  .map((cat) => (
                     <span
                       key={cat}
                       className="inline-flex items-center gap-1.5 text-xs px-3 py-1 bg-brand-50 text-brand-700 border border-brand-200 rounded-lg"
@@ -381,7 +402,7 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
           <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
             <FileText className="w-4 h-4 text-brand-500" />
             <h2 className="text-sm font-bold font-heading uppercase tracking-wider text-slate-900">
-              Operational Notes & Sourcing Insights
+              Notes
             </h2>
           </div>
 
@@ -390,7 +411,7 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
               rows={3}
               placeholder="e.g. Found via Instagram @handle. Very prompt with dispatch. Best price on 100ml reed diffusers. Closed on Sundays."
               value={notes}
-              onChange={e => setNotes(e.target.value)}
+              onChange={(e) => setNotes(e.target.value)}
               className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all resize-none"
             />
           </div>
@@ -402,9 +423,12 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
             type="button"
             onClick={() => {
               if (existingVendor) {
-                setCurrentView({ type: 'vendor-detail', id: existingVendor.id });
+                setCurrentView({
+                  type: "vendor-detail",
+                  id: existingVendor.id,
+                });
               } else {
-                setCurrentView({ type: 'vendor-list' });
+                setCurrentView({ type: "vendor-list" });
               }
             }}
             className="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors"
@@ -416,10 +440,9 @@ export const VendorFormPage: React.FC<VendorFormPageProps> = ({ vendorId }) => {
             className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 rounded-xl shadow-xs transition-all"
           >
             <Save className="w-4 h-4" />
-            <span>{existingVendor ? 'Save Changes' : 'Create Vendor'}</span>
+            <span>{existingVendor ? "Save Changes" : "Create Vendor"}</span>
           </button>
         </div>
-
       </form>
     </div>
   );
