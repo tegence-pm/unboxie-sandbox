@@ -6,14 +6,13 @@ import {
   Building2, 
   Plus, 
   Search, 
-  AlertCircle
+  Package,
+  CheckCircle2
 } from 'lucide-react';
-import { formatNaira } from '../../utils/formatters';
 
 export const VendorList: React.FC = () => {
   const { 
     vendors, 
-    incidents,
     setCurrentView,
   } = useApp();
 
@@ -51,8 +50,10 @@ export const VendorList: React.FC = () => {
   });
 
   const totalVendors = vendors.length;
+  const souvenirVendors = vendors.filter(v => v.type === 'Souvenir Vendor').length;
+  const customizationVendors = vendors.filter(v => v.type === 'Customization Vendor').length;
   const activeVendors = vendors.filter(v => v.status === 'Active').length;
-  const totalIncidentCost = incidents.reduce((acc, i) => acc + (i.cost || 0), 0);
+  const inactiveVendors = vendors.filter(v => v.status === 'Inactive').length;
 
   return (
     <div className="space-y-6">
@@ -77,21 +78,28 @@ export const VendorList: React.FC = () => {
         </button>
       </div>
 
-      {/* KPI Stat Cards (active source rating and total sourced items removed as requested) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* KPI Stat Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           title="Total Vendors"
           value={totalVendors}
-          subtitle={`${activeVendors} currently in Active Sourcing Network`}
+          subtitle="All suppliers registered in directory"
           icon={Building2}
           variant="default"
         />
         <StatCard
-          title="Total Quality Loss (Incidents)"
-          value={formatNaira(totalIncidentCost)}
-          subtitle={`${incidents.length} order quality issue(s) recorded`}
-          icon={AlertCircle}
-          variant={totalIncidentCost > 0 ? "warning" : "default"}
+          title="Souvenir vs Customization"
+          value={`${souvenirVendors} : ${customizationVendors}`}
+          subtitle={`${souvenirVendors} Souvenir • ${customizationVendors} Customization`}
+          icon={Package}
+          variant="brand"
+        />
+        <StatCard
+          title="Active vs Inactive"
+          value={`${activeVendors} : ${inactiveVendors}`}
+          subtitle={`${activeVendors} Active • ${inactiveVendors} Inactive`}
+          icon={CheckCircle2}
+          variant="success"
         />
       </div>
 

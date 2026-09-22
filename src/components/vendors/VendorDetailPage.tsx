@@ -18,7 +18,9 @@ import {
   ExternalLink,
   CheckCircle2,
   Clock,
-  ShoppingCart
+  ShoppingCart,
+  ShieldCheck,
+  Percent
 } from 'lucide-react';
 import { formatNaira, formatRelativeTime, formatDate } from '../../utils/formatters';
 
@@ -93,7 +95,7 @@ export const VendorDetailPage: React.FC<VendorDetailPageProps> = ({ vendorId }) 
                 dot
                 size="md"
               >
-                {vendor.status} Sourcing Network
+                {vendor.status}
               </Badge>
             </div>
             <p className="text-xs text-slate-500 mt-1 flex items-center gap-2 flex-wrap">
@@ -151,54 +153,121 @@ export const VendorDetailPage: React.FC<VendorDetailPageProps> = ({ vendorId }) 
         </div>
       </div>
 
-      {/* 3 Structured KPI Cards (Reliability Score removed) */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-subtle">
+      {/* 5 Structured KPI Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5">
+        {/* Total Sourced Items */}
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-subtle flex flex-col justify-between">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Times Used</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Times Sourced</span>
             <div className="p-2 rounded-xl bg-orange-50 text-brand-500">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-bold font-heading text-slate-900">
-            {vendor.timesUsed || 0}
+          <div>
+            <div className="text-2xl font-bold font-heading text-slate-900">
+              {performance.totalSourcedItems}
+            </div>
+            <p className="text-[11px] text-slate-500 mt-1 flex items-center gap-1 truncate">
+              <Clock className="w-3 h-3 text-slate-400 flex-shrink-0" />
+              <span className="truncate">Last: <strong className="text-slate-700">{formatRelativeTime(vendor.lastUsedDate)}</strong></span>
+            </p>
           </div>
-          <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-            <Clock className="w-3 h-3 text-slate-400" />
-            <span>Last sourced: <strong className="text-slate-700">{formatRelativeTime(vendor.lastUsedDate)}</strong></span>
-          </p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-subtle">
+        {/* Issue Rate: (Total Incidents ÷ Total Sourced Items) × 100 */}
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-subtle flex flex-col justify-between">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Quality Loss</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Issue Rate</span>
+            <div className={`p-2 rounded-xl ${
+              performance.issueRate === 0 
+                ? 'bg-emerald-50 text-emerald-600' 
+                : performance.issueRate <= 10 
+                ? 'bg-amber-50 text-amber-600' 
+                : 'bg-rose-50 text-rose-600'
+            }`}>
+              <Percent className="w-4 h-4" />
+            </div>
+          </div>
+          <div>
+            <div className={`text-2xl font-bold font-heading ${
+              performance.issueRate === 0 
+                ? 'text-emerald-700' 
+                : performance.issueRate <= 10 
+                ? 'text-amber-700' 
+                : 'text-rose-600'
+            }`}>
+              {performance.issueRate}%
+            </div>
+            <p className="text-[11px] text-slate-500 mt-1 truncate" title={`(${performance.issueCount} incidents ÷ ${performance.totalSourcedItems} items) × 100`}>
+              {performance.issueCount} incident{performance.issueCount === 1 ? '' : 's'} / {performance.totalSourcedItems} items
+            </p>
+          </div>
+        </div>
+
+        {/* Reliability / Trust Score: 100% - Issue Rate */}
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-subtle flex flex-col justify-between">
+          <div className="flex items-center justify-between text-slate-400 mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Trust Score</span>
+            <div className={`p-2 rounded-xl ${
+              performance.reliabilityScore >= 90 
+                ? 'bg-emerald-50 text-emerald-600' 
+                : performance.reliabilityScore >= 75 
+                ? 'bg-amber-50 text-amber-600' 
+                : 'bg-rose-50 text-rose-600'
+            }`}>
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+          </div>
+          <div>
+            <div className={`text-2xl font-bold font-heading ${
+              performance.reliabilityScore >= 90 
+                ? 'text-emerald-700' 
+                : performance.reliabilityScore >= 75 
+                ? 'text-amber-700' 
+                : 'text-rose-600'
+            }`}>
+              {performance.reliabilityScore}%
+            </div>
+            <p className="text-[11px] text-slate-500 mt-1 truncate">
+              {performance.issueCount === 0 ? 'Flawless track record' : `${performance.issueRate}% defect rate`}
+            </p>
+          </div>
+        </div>
+
+        {/* Total Quality Loss */}
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-subtle flex flex-col justify-between">
+          <div className="flex items-center justify-between text-slate-400 mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Quality Loss</span>
             <div className="p-2 rounded-xl bg-rose-50 text-rose-600">
               <AlertTriangle className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-bold font-heading text-rose-600">
-            {formatNaira(performance.totalIssueCost)}
+          <div>
+            <div className="text-2xl font-bold font-heading text-rose-600">
+              {formatNaira(performance.totalIssueCost)}
+            </div>
+            <p className="text-[11px] text-slate-500 mt-1 truncate">
+              Across {incidents.length} issue{incidents.length === 1 ? '' : 's'}
+            </p>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
-            Across {incidents.length} recorded issue(s)
-          </p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-subtle">
+        {/* Cost Liability */}
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-subtle flex flex-col justify-between col-span-2 md:col-span-1">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Cost Liability</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Liability Split</span>
             <div className="p-2 rounded-xl bg-slate-100 text-slate-600">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
           <div className="space-y-1 text-xs font-bold">
-            <div className="text-emerald-700 flex justify-between">
-              <span>Vendor Covered:</span>
-              <span>{formatNaira(performance.costCoveredByVendor)}</span>
+            <div className="text-emerald-700 flex justify-between gap-1">
+              <span className="truncate">Vendor:</span>
+              <span className="whitespace-nowrap">{formatNaira(performance.costCoveredByVendor)}</span>
             </div>
-            <div className="text-rose-600 flex justify-between">
-              <span>Unboxie Loss:</span>
-              <span>{formatNaira(performance.costCoveredByUnboxie)}</span>
+            <div className="text-rose-600 flex justify-between gap-1">
+              <span className="truncate">Unboxie:</span>
+              <span className="whitespace-nowrap">{formatNaira(performance.costCoveredByUnboxie)}</span>
             </div>
           </div>
         </div>
@@ -516,7 +585,7 @@ export const VendorDetailPage: React.FC<VendorDetailPageProps> = ({ vendorId }) 
                   <thead className="bg-slate-50 text-slate-400 uppercase tracking-wider font-bold border-b border-slate-200">
                     <tr>
                       <th className="py-3 px-4">ORDER #</th>
-                      <th className="py-3 px-4">AFFECTED ITEM</th>
+                      <th className="py-3 px-4">AFFECTED PRODUCT</th>
                       <th className="py-3 px-4">DESCRIPTION</th>
                       <th className="py-3 px-4">COST (₦)</th>
                       <th className="py-3 px-4">COVERED BY</th>
@@ -546,6 +615,11 @@ export const VendorDetailPage: React.FC<VendorDetailPageProps> = ({ vendorId }) 
                           <span className="font-semibold text-slate-800 block">
                             {inc.itemName}
                           </span>
+                          {inc.issueType && (
+                            <span className="inline-block text-[10px] font-medium text-amber-700 bg-amber-50 border border-amber-200/60 px-1.5 py-0.5 rounded-md mt-0.5">
+                              {inc.issueType}
+                            </span>
+                          )}
                         </td>
 
                         <td className="py-3.5 px-4 max-w-xs">

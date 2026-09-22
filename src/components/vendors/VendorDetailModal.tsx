@@ -16,7 +16,9 @@ import {
   Trash2, 
   PlusCircle, 
   ExternalLink,
-  CheckCircle2
+  CheckCircle2,
+  ShieldCheck,
+  Percent
 } from 'lucide-react';
 import { formatNaira, formatRelativeTime, formatDate } from '../../utils/formatters';
 
@@ -85,7 +87,7 @@ export const VendorDetailModal: React.FC<VendorDetailModalProps> = ({
                   dot
                   size="md"
                 >
-                  {vendor.status} Sourcing Network
+                  {vendor.status}
                 </Badge>
                 
                 <Badge variant={vendor.type === 'Souvenir Vendor' ? 'brand' : 'purple'} size="md">
@@ -184,38 +186,82 @@ export const VendorDetailModal: React.FC<VendorDetailModalProps> = ({
           )}
         </div>
 
-        {/* 3-Column Key Sourcing Scorecard (Reliability removed) */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
+        {/* 5-Column Key Sourcing Scorecard */}
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+          <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-2xs flex flex-col justify-between">
             <div className="flex items-center justify-between text-slate-500 mb-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wider">Times Used</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider">Sourced</span>
               <TrendingUp className="w-3.5 h-3.5 text-brand-500" />
             </div>
-            <div className="text-xl font-bold font-heading text-slate-900">
-              {vendor.timesUsed || 0}
+            <div>
+              <div className="text-lg font-bold font-heading text-slate-900">
+                {performance.totalSourcedItems}
+              </div>
+              <span className="text-[10px] text-slate-500 block truncate">Total items</span>
             </div>
-            <span className="text-[11px] text-slate-500">Orders fulfilled</span>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
+          <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-2xs flex flex-col justify-between">
             <div className="flex items-center justify-between text-slate-500 mb-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wider">Issue Loss</span>
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+              <span className="text-[10px] font-bold uppercase tracking-wider">Issue Rate</span>
+              <Percent className={`w-3.5 h-3.5 ${performance.issueRate === 0 ? 'text-emerald-500' : 'text-amber-500'}`} />
             </div>
-            <div className="text-xl font-bold font-heading text-slate-900">
-              {formatNaira(performance.totalIssueCost)}
+            <div>
+              <div className={`text-lg font-bold font-heading ${
+                performance.issueRate === 0 ? 'text-emerald-700' : 'text-amber-700'
+              }`}>
+                {performance.issueRate}%
+              </div>
+              <span className="text-[10px] text-slate-500 block truncate">
+                {performance.issueCount} incident{performance.issueCount === 1 ? '' : 's'}
+              </span>
             </div>
-            <span className="text-[11px] text-slate-500">Total incident value</span>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
+          <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-2xs flex flex-col justify-between">
             <div className="flex items-center justify-between text-slate-500 mb-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wider">Cost Absorbed</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider">Trust Score</span>
+              <ShieldCheck className={`w-3.5 h-3.5 ${performance.reliabilityScore >= 90 ? 'text-emerald-500' : 'text-amber-500'}`} />
+            </div>
+            <div>
+              <div className={`text-lg font-bold font-heading ${
+                performance.reliabilityScore >= 90 ? 'text-emerald-700' : 'text-amber-700'
+              }`}>
+                {performance.reliabilityScore}%
+              </div>
+              <span className="text-[10px] text-slate-500 block truncate">
+                {performance.issueCount === 0 ? 'Flawless track record' : `${performance.issueRate}% defect rate`}
+              </span>
+            </div>
+          </div>
+
+          <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-2xs flex flex-col justify-between">
+            <div className="flex items-center justify-between text-slate-500 mb-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider">Issue Loss</span>
+              <AlertTriangle className="w-3.5 h-3.5 text-rose-500" />
+            </div>
+            <div>
+              <div className="text-lg font-bold font-heading text-rose-600">
+                {formatNaira(performance.totalIssueCost)}
+              </div>
+              <span className="text-[10px] text-slate-500 block truncate">Total value</span>
+            </div>
+          </div>
+
+          <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-2xs flex flex-col justify-between col-span-2 sm:col-span-1">
+            <div className="flex items-center justify-between text-slate-500 mb-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider">Liability</span>
               <DollarSign className="w-3.5 h-3.5 text-slate-500" />
             </div>
-            <div className="text-xs font-semibold text-slate-800 space-y-0.5">
-              <div className="text-emerald-700">Vendor: {formatNaira(performance.costCoveredByVendor)}</div>
-              <div className="text-rose-600">Unboxie: {formatNaira(performance.costCoveredByUnboxie)}</div>
+            <div className="text-[11px] font-semibold text-slate-800 space-y-0.5">
+              <div className="text-emerald-700 flex justify-between gap-1">
+                <span>Vendor:</span>
+                <span className="font-bold">{formatNaira(performance.costCoveredByVendor)}</span>
+              </div>
+              <div className="text-rose-600 flex justify-between gap-1">
+                <span>Unboxie:</span>
+                <span className="font-bold">{formatNaira(performance.costCoveredByUnboxie)}</span>
+              </div>
             </div>
           </div>
         </div>

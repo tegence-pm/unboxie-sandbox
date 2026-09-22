@@ -196,7 +196,7 @@ export const IncidentList: React.FC = () => {
               <thead className="bg-slate-50/80 text-slate-400 uppercase tracking-wider font-bold border-b border-slate-200">
                 <tr>
                   <th className="py-3 px-4">ORDER #</th>
-                  <th className="py-3 px-4">AFFECTED ITEM</th>
+                  <th className="py-3 px-4">AFFECTED PRODUCT</th>
                   <th className="py-3 px-4">RESPONSIBLE VENDOR</th>
                   <th className="py-3 px-4">DESCRIPTION</th>
                   <th className="py-3 px-4">COST (₦)</th>
@@ -224,11 +224,16 @@ export const IncidentList: React.FC = () => {
                       </span>
                     </td>
 
-                    {/* Affected Item */}
+                    {/* Affected Product */}
                     <td className="py-3.5 px-4">
                       <span className="font-semibold text-slate-800 block">
                         {inc.itemName}
                       </span>
+                      {inc.issueType && (
+                        <span className="inline-block text-[10px] font-medium text-amber-700 bg-amber-50 border border-amber-200/60 px-1.5 py-0.5 rounded-md mt-0.5">
+                          {inc.issueType}
+                        </span>
+                      )}
                     </td>
 
                     {/* Responsible Vendor */}

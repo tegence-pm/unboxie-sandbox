@@ -100,11 +100,13 @@ interface AppContextType {
   getVendorOrders: (vendorId: string) => { order: Order; items: string[] }[];
   getVendorPerformance: (vendorId: string) => {
     timesUsed: number;
+    totalSourcedItems: number;
     issueCount: number;
+    issueRate: number;
+    reliabilityScore: number;
     totalIssueCost: number;
     costCoveredByVendor: number;
     costCoveredByUnboxie: number;
-    reliabilityScore: number;
     lastUsedDate?: string;
   };
 
@@ -372,6 +374,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     
     const timesUsed = vendor?.timesUsed || 0;
     const issueCount = vendorIncidents.length;
+
+    // Count total items sourced from this vendor across all orders
+    let totalSourcedItems = 0;
+    orders.forEach(order => {
+      order.items.forEach(it => {
+        if (it.sourcedVendorId === vendorId) {
+          totalSourcedItems += it.quantity || 1;
+        }
+      });
+      if (order.packagingVendorId === vendorId) {
+        totalSourcedItems += 1;
+      }
+    });
+
+    const effectiveSourcedCount = Math.max(timesUsed, totalSourcedItems);
     
     let totalIssueCost = 0;
     let costCoveredByVendor = 0;
@@ -389,17 +406,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     });
 
-    const issueRate = timesUsed > 0 ? (issueCount / timesUsed) : 0;
-    let reliabilityScore = Math.max(0, Math.round(100 - issueRate * 100));
-    if (timesUsed === 0) reliabilityScore = 100;
+    // Issue Rate = (Total Incidents ÷ Total Sourced Items) × 100
+    const rawIssueRate = effectiveSourcedCount > 0 
+      ? (issueCount / effectiveSourcedCount) * 100 
+      : 0;
+    const issueRate = Number(rawIssueRate.toFixed(1));
+
+    // Reliability/Trust Score = 100% - Issue Rate
+    const reliabilityScore = effectiveSourcedCount > 0 
+      ? Math.max(0, Math.min(100, Number((100 - rawIssueRate).toFixed(1)))) 
+      : 100;
 
     return {
       timesUsed,
+      totalSourcedItems: effectiveSourcedCount,
       issueCount,
+      issueRate,
+      reliabilityScore,
       totalIssueCost,
       costCoveredByVendor,
       costCoveredByUnboxie,
-      reliabilityScore,
       lastUsedDate: vendor?.lastUsedDate,
     };
   };

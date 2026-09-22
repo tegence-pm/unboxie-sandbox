@@ -114,6 +114,17 @@ export interface Order {
 export type CostBearer = 'Unboxie' | 'Vendor' | 'Split';
 export type IncidentStatus = 'Open' | 'Resolved';
 
+export type IssueType =
+  | 'Damaged Product'
+  | 'Wrong Colour'
+  | 'Wrong Quantity'
+  | 'Incomplete Product'
+  | 'Different Product'
+  | 'Vendor Delay'
+  | 'Additional Cost Incurred'
+  | 'Unexpected Vendor Cancellation'
+  | 'Other';
+
 export interface Incident {
   id: string;
   orderId: string;
@@ -122,6 +133,7 @@ export interface Incident {
   vendorName: string;
   itemId?: string;
   itemName: string;
+  issueType?: IssueType | string;
   description: string;
   cost: number; // in Naira (₦)
   costCoveredBy: CostBearer;
